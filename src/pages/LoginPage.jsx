@@ -40,22 +40,52 @@ const LoginPage = ({ onNavigate, onLogin }) => {
         setIsLoading(true)
 
         try {
-            await new Promise(resolve => setTimeout(resolve, 2000))
+            // Simular delay de red
+            await new Promise(resolve => setTimeout(resolve, 1500))
 
-            toast({
-                title: "¡Bienvenido de vuelta!",
-                description: "Has iniciado sesión correctamente",
-                status: "success",
-                duration: 3000,
-                isClosable: true,
-            })
+            // Validar credenciales de demo
+            const isDemoCredentials = (
+                data.email === 'demo@voyaj.com' && data.password === 'demo123'
+            )
 
-            console.log('Login successful:', data)
+            if (isDemoCredentials) {
+                // Credenciales correctas - crear usuario mock
+                const userData = {
+                    id: 1,
+                    email: data.email,
+                    name: 'Juan Pérez',
+                    firstName: 'Juan',
+                    lastName: 'Pérez',
+                    avatar: null,
+                    plan: 'premium'
+                }
+
+                toast({
+                    title: "¡Bienvenido de vuelta!",
+                    description: "Has iniciado sesión correctamente",
+                    status: "success",
+                    duration: 3000,
+                    isClosable: true,
+                })
+
+                // Llamar a onLogin para actualizar el estado y navegar
+                onLogin(userData)
+
+            } else {
+                // Credenciales incorrectas
+                toast({
+                    title: "Credenciales incorrectas",
+                    description: "Email o contraseña incorrectos. Usa las credenciales de demo.",
+                    status: "error",
+                    duration: 4000,
+                    isClosable: true,
+                })
+            }
 
         } catch (error) {
             toast({
                 title: "Error al iniciar sesión",
-                description: "Email o contraseña incorrectos",
+                description: "Ocurrió un error inesperado. Intenta nuevamente.",
                 status: "error",
                 duration: 3000,
                 isClosable: true,
@@ -68,7 +98,7 @@ const LoginPage = ({ onNavigate, onLogin }) => {
     const handleSocialLogin = (provider) => {
         toast({
             title: `Conectando con ${provider}`,
-            description: "Redirigiendo...",
+            description: "Esta función estará disponible pronto",
             status: "info",
             duration: 2000,
             isClosable: true,
@@ -81,6 +111,12 @@ const LoginPage = ({ onNavigate, onLogin }) => {
 
     const handleGoToRegister = () => {
         onNavigate('/register')
+    }
+
+    // Función para rellenar credenciales de demo
+    const fillDemoCredentials = () => {
+        document.querySelector('input[name="email"]').value = 'demo@voyaj.com'
+        document.querySelector('input[name="password"]').value = 'demo123'
     }
 
     return (
@@ -345,12 +381,22 @@ const LoginPage = ({ onNavigate, onLogin }) => {
                             borderColor="blue.100"
                             textAlign="center"
                         >
-                            <Text fontSize="sm" color="blue.700" fontWeight="500">
+                            <Text fontSize="sm" color="blue.700" fontWeight="500" mb={2}>
                                 💡 Demo - Credenciales de prueba
                             </Text>
-                            <Text fontSize="xs" color="blue.600" mt={1}>
+                            <Text fontSize="xs" color="blue.600" mb={3}>
                                 Email: demo@voyaj.com • Contraseña: demo123
                             </Text>
+                            <Button
+                                size="sm"
+                                variant="outline"
+                                borderColor="blue.200"
+                                color="blue.600"
+                                _hover={{ bg: "blue.100" }}
+                                onClick={fillDemoCredentials}
+                            >
+                                Rellenar automáticamente
+                            </Button>
                         </Box>
 
                         {/* Welcome message */}

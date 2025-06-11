@@ -1,18 +1,16 @@
-import { ChakraProvider } from '@chakra-ui/react'
+import { ChakraProvider, ColorModeScript } from '@chakra-ui/react'
 import { useState, useEffect } from 'react'
 import theme from './styles/theme'
 import LandingPage from './pages/LandingPage'
 import LoginPage from './pages/LoginPage'
 import RegisterPage from './pages/RegisterPage'
-
-// Importación condicional del Dashboard
-let DashboardPage
-try {
-    DashboardPage = require('./pages/DashboardPage').default
-} catch (error) {
-    console.error('Dashboard component not found:', error)
-    DashboardPage = null
-}
+import DashboardPage from './pages/DashboardPage'
+import CreateTripPage from './pages/CreateTripPage'
+import MyTripsPage from './pages/MyTripsPage'
+import PhotosPage from './pages/PhotosPage'
+import StatsPage from './pages/StatsPage'
+import ProfilePage from './pages/ProfilePage'
+import SettingsPage from './pages/SettingsPage'
 
 function App() {
     const [currentRoute, setCurrentRoute] = useState('/')
@@ -54,10 +52,35 @@ function App() {
         }
     }, [])
 
+    // FORZAR MODO CLARO - Prevenir que el sistema cambie el tema
+    useEffect(() => {
+        // Forzar el color-scheme a light
+        document.documentElement.style.colorScheme = 'light'
+        document.body.style.colorScheme = 'light'
+
+        // Agregar meta tag si no existe
+        const existingMeta = document.querySelector('meta[name="color-scheme"]')
+        if (!existingMeta) {
+            const meta = document.createElement('meta')
+            meta.name = 'color-scheme'
+            meta.content = 'light'
+            document.head.appendChild(meta)
+        } else {
+            existingMeta.content = 'light'
+        }
+    }, [])
+
+    // Función para verificar si el usuario está autenticado
+    const requireAuth = (component) => {
+        if (!user) {
+            return <LoginPage onNavigate={navigate} onLogin={handleLogin} />
+        }
+        return component
+    }
+
     // Debug: log current state
     console.log('Current route:', currentRoute)
     console.log('User:', user)
-    console.log('Dashboard component available:', !!DashboardPage)
 
     // Función para renderizar la página actual
     const renderCurrentPage = () => {
@@ -67,21 +90,33 @@ function App() {
             case '/register':
                 return <RegisterPage onNavigate={navigate} onLogin={handleLogin} />
             case '/dashboard':
-                if (!user) {
-                    console.log('No user found, redirecting to login')
-                    return <LoginPage onNavigate={navigate} onLogin={handleLogin} />
-                }
-                if (!DashboardPage) {
-                    console.log('Dashboard component not found, showing error')
-                    return (
-                        <div style={{ padding: '20px', textAlign: 'center' }}>
-                            <h1>Error: Dashboard component not found</h1>
-                            <p>Please create the file: src/pages/DashboardPage.jsx</p>
-                            <button onClick={() => navigate('/login')}>Go to Login</button>
-                        </div>
-                    )
-                }
-                return <DashboardPage onNavigate={navigate} onLogout={handleLogout} user={user} />
+                return requireAuth(
+                    <DashboardPage onNavigate={navigate} onLogout={handleLogout} user={user} />
+                )
+            case '/create-trip':
+                return requireAuth(
+                    <CreateTripPage onNavigate={navigate} onLogout={handleLogout} user={user} />
+                )
+            case '/my-trips':
+                return requireAuth(
+                    <MyTripsPage onNavigate={navigate} onLogout={handleLogout} user={user} />
+                )
+            case '/photos':
+                return requireAuth(
+                    <PhotosPage onNavigate={navigate} onLogout={handleLogout} user={user} />
+                )
+            case '/stats':
+                return requireAuth(
+                    <StatsPage onNavigate={navigate} onLogout={handleLogout} user={user} />
+                )
+            case '/profile':
+                return requireAuth(
+                    <ProfilePage onNavigate={navigate} onLogout={handleLogout} user={user} />
+                )
+            case '/settings':
+                return requireAuth(
+                    <SettingsPage onNavigate={navigate} onLogout={handleLogout} user={user} />
+                )
             case '/':
             default:
                 return <LandingPage onNavigate={navigate} />
@@ -89,9 +124,13 @@ function App() {
     }
 
     return (
-        <ChakraProvider theme={theme}>
-            {renderCurrentPage()}
-        </ChakraProvider>
+        <>
+            {/* Script para forzar modo claro desde el inicio */}
+            <ColorModeScript initialColorMode={theme.config.initialColorMode} />
+            <ChakraProvider theme={theme}>
+                {renderCurrentPage()}
+            </ChakraProvider>
+        </>
     )
 }
 

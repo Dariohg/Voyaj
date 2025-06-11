@@ -28,18 +28,28 @@ const colors = {
 }
 
 const theme = extendTheme({
+    // FORZAR MODO CLARO SIEMPRE
+    config: {
+        initialColorMode: 'light',
+        useSystemColorMode: false, // ¡IMPORTANTE! Esto evita que use el tema del sistema
+    },
     colors,
     fonts: {
         heading: 'Inter, system-ui, sans-serif',
         body: 'Inter, system-ui, sans-serif',
     },
     styles: {
-        global: {
+        global: (props) => ({
+            // Forzar fondo blanco siempre
             body: {
-                bg: 'white',
-                color: 'gray.800',
+                bg: 'white !important', // !important para sobreescribir el tema del sistema
+                color: 'gray.800 !important',
             },
-        },
+            // Asegurar que el HTML también tenga fondo blanco
+            html: {
+                bg: 'white !important',
+            }
+        }),
     },
     components: {
         Button: {
@@ -78,13 +88,33 @@ const theme = extendTheme({
         Card: {
             baseStyle: {
                 container: {
-                    bg: 'white',
+                    bg: 'white !important', // Forzar fondo blanco en cards
                     borderRadius: 'xl',
                     boxShadow: 'xl',
                     p: 6,
                 },
             },
         },
+        // Forzar colores en Menu para móvil
+        Menu: {
+            baseStyle: {
+                list: {
+                    bg: 'white !important',
+                    borderColor: 'gray.200 !important',
+                    color: 'gray.800 !important',
+                },
+                item: {
+                    bg: 'white !important',
+                    color: 'gray.800 !important',
+                    _hover: {
+                        bg: 'gray.50 !important',
+                    },
+                    _focus: {
+                        bg: 'gray.50 !important',
+                    }
+                }
+            }
+        }
     },
 })
 

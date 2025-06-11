@@ -16,15 +16,28 @@ const StatsSection = () => {
     ]
 
     return (
-        <Box py={16} bg="sage.400">
-            <Container maxW="7xl">
-                <SimpleGrid columns={{ base: 2, md: 4 }} spacing={8}>
+        <Box py={{ base: 12, md: 16 }} bg="sage.400">
+            <Container maxW="7xl" px={{ base: 4, md: 8 }}>
+                <SimpleGrid
+                    columns={{ base: 2, md: 4 }}
+                    spacing={{ base: 6, md: 8 }}
+                    gap={{ base: 4, md: 8 }}
+                >
                     {stats.map((stat, index) => (
                         <VStack key={index} spacing={2} textAlign="center">
-                            <Heading size="2xl" color="white" fontWeight="bold">
+                            <Heading
+                                size={{ base: "xl", md: "2xl" }}
+                                color="white"
+                                fontWeight="bold"
+                            >
                                 {stat.number}
                             </Heading>
-                            <Text color="sage.100" fontSize="lg">
+                            <Text
+                                color="sage.100"
+                                fontSize={{ base: "sm", md: "lg" }}
+                                textAlign="center"
+                                px={{ base: 2, md: 0 }}
+                            >
                                 {stat.label}
                             </Text>
                         </VStack>

@@ -59,37 +59,68 @@ const FeaturesSection = () => {
     ]
 
     return (
-        <Box py={20} bg="white">
-            <Container maxW="7xl">
-                <VStack spacing={16}>
-                    <VStack spacing={4} textAlign="center">
-                        <Heading size="xl" color="gray.800">
+        <Box py={{ base: 12, md: 20 }} bg="white">
+            <Container maxW="7xl" px={{ base: 4, md: 8 }}>
+                <VStack spacing={{ base: 10, md: 16 }}>
+                    <VStack spacing={4} textAlign="center" maxW="3xl">
+                        <Heading
+                            size={{ base: "lg", md: "xl" }}
+                            color="gray.800"
+                            px={{ base: 4, md: 0 }}
+                        >
                             Todo lo que necesitas en una sola app
                         </Heading>
-                        <Text fontSize="lg" color="gray.600" maxW="2xl">
+                        <Text
+                            fontSize={{ base: "md", md: "lg" }}
+                            color="gray.600"
+                            maxW="2xl"
+                            px={{ base: 4, md: 0 }}
+                            lineHeight="tall"
+                        >
                             Desde la planificación inicial hasta los recuerdos finales,
                             Voyaj te acompaña en cada paso de tu aventura.
                         </Text>
                     </VStack>
 
-                    <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={8}>
+                    <SimpleGrid
+                        columns={{ base: 1, md: 2, lg: 3 }}
+                        spacing={{ base: 6, md: 8 }}
+                        w="full"
+                    >
                         {features.map((feature, index) => (
-                            <Card key={index} variant="outline" _hover={{ transform: 'translateY(-4px)', shadow: 'xl' }} transition="all 0.3s">
-                                <CardBody>
-                                    <VStack spacing={4} align="start">
+                            <Card
+                                key={index}
+                                variant="outline"
+                                _hover={{
+                                    transform: { base: "none", md: "translateY(-4px)" },
+                                    shadow: "xl"
+                                }}
+                                transition="all 0.3s"
+                                h="full"
+                            >
+                                <CardBody p={{ base: 4, md: 6 }}>
+                                    <VStack spacing={4} align="start" h="full">
                                         <Icon
                                             as={feature.icon}
-                                            boxSize={12}
+                                            boxSize={{ base: 10, md: 12 }}
                                             color={feature.color}
                                             p={2}
                                             bg={`${feature.color.split('.')[0]}.50`}
                                             borderRadius="lg"
                                         />
-                                        <VStack spacing={2} align="start">
-                                            <Heading size="md" color="gray.800">
+                                        <VStack spacing={2} align="start" flex={1}>
+                                            <Heading
+                                                size={{ base: "sm", md: "md" }}
+                                                color="gray.800"
+                                                lineHeight="short"
+                                            >
                                                 {feature.title}
                                             </Heading>
-                                            <Text color="gray.600" lineHeight="tall">
+                                            <Text
+                                                color="gray.600"
+                                                lineHeight="tall"
+                                                fontSize={{ base: "sm", md: "md" }}
+                                            >
                                                 {feature.description}
                                             </Text>
                                         </VStack>

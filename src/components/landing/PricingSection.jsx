@@ -79,7 +79,7 @@ const PricingSection = ({ onShowRegister }) => {
         },
         {
             name: "Nómada Digital",
-            subtitle: "Para profesionales del viaje",
+            subtitle: "Para viajeros profesionales",
             price: "$19.99",
             period: "mes",
             popular: false,
@@ -88,14 +88,14 @@ const PricingSection = ({ onShowRegister }) => {
             features: [
                 "Todo lo de Aventurero",
                 "Viajes en grupo ilimitado",
-                "API personalizada",
-                "Integración con bancos",
-                "Análisis predictivo de costos",
-                "Reportes de impuestos automáticos",
-                "Almacenamiento en la nube ilimitado",
-                "Acceso temprano a nuevas funciones",
-                "Sesión personal de onboarding",
-                "Soporte dedicado por WhatsApp"
+                "Almacenamiento de fotos ilimitado",
+                "Exportación avanzada (PDF detallado)",
+                "Análisis de gastos por categorías",
+                "Historial completo de viajes",
+                "Copias de seguridad automáticas",
+                "Acceso prioritario a nuevas funciones",
+                "Soporte prioritario 24/7",
+                "Sin límite de dispositivos"
             ],
             limitations: []
         }

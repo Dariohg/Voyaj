@@ -24,7 +24,7 @@ import {
 } from '@chakra-ui/react'
 import { FiEye, FiEyeOff, FiMail, FiMapPin, FiArrowLeft, FiUser, FiCheck } from 'react-icons/fi'
 import { FaGoogle, FaFacebook } from 'react-icons/fa'
-import { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 
 const RegisterPage = ({ onNavigate, onLogin }) => {
@@ -191,25 +191,6 @@ const RegisterPage = ({ onNavigate, onLogin }) => {
                                 transition="all 0.2s"
                             >
                                 Continuar con Google
-                            </Button>
-                            <Button
-                                w="full"
-                                h="48px"
-                                variant="outline"
-                                borderColor="gray.200"
-                                leftIcon={<FaFacebook color="#1877F2" />}
-                                onClick={() => handleSocialLogin('Facebook')}
-                                _hover={{
-                                    borderColor: "gray.300",
-                                    bg: "gray.50",
-                                    transform: "translateY(-1px)",
-                                    shadow: "sm"
-                                }}
-                                fontWeight="500"
-                                color="gray.700"
-                                transition="all 0.2s"
-                            >
-                                Continuar con Facebook
                             </Button>
                         </VStack>
 
@@ -532,23 +513,6 @@ const RegisterPage = ({ onNavigate, onLogin }) => {
                                 </Link>
                             </HStack>
                         </Center>
-
-                        {/* Benefits note */}
-                        <Box
-                            bg="green.50"
-                            p={4}
-                            borderRadius="12px"
-                            border="1px"
-                            borderColor="green.100"
-                            textAlign="center"
-                        >
-                            <Text fontSize="sm" color="green.700" fontWeight="500">
-                                🎉 Tu primer viaje es gratis
-                            </Text>
-                            <Text fontSize="xs" color="green.600" mt={1}>
-                                Sin tarjeta de crédito • Cancela cuando quieras
-                            </Text>
-                        </Box>
                     </VStack>
                 </VStack>
             </Container>

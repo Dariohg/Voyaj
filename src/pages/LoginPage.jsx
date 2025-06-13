@@ -20,7 +20,7 @@ import {
 } from '@chakra-ui/react'
 import { FiEye, FiEyeOff, FiMail, FiMapPin, FiArrowLeft } from 'react-icons/fi'
 import { FaGoogle, FaFacebook } from 'react-icons/fa'
-import { useState } from 'react'
+import React, { useState } from 'react'
 import { useForm } from 'react-hook-form'
 
 const LoginPage = ({ onNavigate, onLogin }) => {
@@ -189,25 +189,6 @@ const LoginPage = ({ onNavigate, onLogin }) => {
                                 transition="all 0.2s"
                             >
                                 Continuar con Google
-                            </Button>
-                            <Button
-                                w="full"
-                                h="48px"
-                                variant="outline"
-                                borderColor="gray.200"
-                                leftIcon={<FaFacebook color="#1877F2" />}
-                                onClick={() => handleSocialLogin('Facebook')}
-                                _hover={{
-                                    borderColor: "gray.300",
-                                    bg: "gray.50",
-                                    transform: "translateY(-1px)",
-                                    shadow: "sm"
-                                }}
-                                fontWeight="500"
-                                color="gray.700"
-                                transition="all 0.2s"
-                            >
-                                Continuar con Facebook
                             </Button>
                         </VStack>
 
@@ -397,24 +378,6 @@ const LoginPage = ({ onNavigate, onLogin }) => {
                             >
                                 Rellenar automáticamente
                             </Button>
-                        </Box>
-
-                        {/* Welcome message */}
-                        <Box
-                            bg="vanilla.50"
-                            p={6}
-                            borderRadius="16px"
-                            border="1px"
-                            borderColor="vanilla.200"
-                            textAlign="center"
-                        >
-                            <Text fontSize="sm" color="gray.700" fontWeight="500" mb={2}>
-                                ✨ ¡Qué bueno verte de nuevo!
-                            </Text>
-                            <Text fontSize="xs" color="gray.600" lineHeight="tall">
-                                Tus viajes te están esperando. Accede a todos tus recuerdos
-                                guardados y planifica nuevas aventuras increíbles.
-                            </Text>
                         </Box>
                     </VStack>
                 </VStack>

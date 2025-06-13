@@ -17,7 +17,13 @@ import {
     MenuButton,
     MenuList,
     MenuItem,
-    useBreakpointValue, Flex
+    useBreakpointValue,
+    Grid,
+    GridItem,
+    Flex,
+    Divider,
+    Avatar,
+    AvatarGroup
 } from '@chakra-ui/react'
 import {
     FiPlus,
@@ -28,134 +34,142 @@ import {
     FiMapPin,
     FiMoreVertical,
     FiEdit,
-    FiTrash2
+    FiTrash2,
+    FiUsers,
+    FiStar,
+    FiArrowUp,
+    FiArrowDown,
+    FiHeart,
+    FiEye
 } from 'react-icons/fi'
 import { useState } from 'react'
-import Navbar from '../components/Navbar'
-import Sidebar from '../components/Sidebar'
 
 const DashboardPage = ({ onNavigate, onLogout, user }) => {
     const isMobile = useBreakpointValue({ base: true, lg: false })
 
-    const [activeTrips] = useState([
+    // Datos actualizados para el nuevo diseño
+    const [stats] = useState([
+        {
+            label: "Total Gastado",
+            value: "$9,834",
+            change: "6.91%",
+            trend: "up",
+            icon: FiDollarSign,
+            color: "blue.500"
+        },
+        {
+            label: "Total Viajes",
+            value: "1,935",
+            change: "3.68%",
+            trend: "up",
+            icon: FiMapPin,
+            color: "purple.500"
+        },
+        {
+            label: "Fotos Subidas",
+            value: "$28,178",
+            change: "9.14%",
+            trend: "up",
+            icon: FiCamera,
+            color: "green.500"
+        },
+        {
+            label: "Experiencias",
+            value: "$17,115",
+            change: "3.71%",
+            trend: "down",
+            icon: FiStar,
+            color: "orange.500"
+        }
+    ])
+
+    const [upcomingTrips] = useState([
         {
             id: 1,
-            title: "Viaje a Japón",
-            destination: "Tokio, Japón",
-            startDate: "15 Jul 2024",
-            endDate: "28 Jul 2024",
-            budget: 2500,
-            spent: 1680,
-            status: "active",
-            progress: 67,
-            image: "🇯🇵"
+            title: "Gran Cañón",
+            location: "Arizona, USA",
+            dates: "7 May - 20 May 2025",
+            rating: 4.8,
+            friends: [
+                { name: "Ana", avatar: "👩‍🦰" },
+                { name: "Carlos", avatar: "👨‍🦱" },
+                { name: "María", avatar: "👩‍🦳" }
+            ],
+            additionalFriends: 2,
+            image: "🏜️",
+            liked: false
         },
         {
             id: 2,
-            title: "Europa Backpack",
-            destination: "París, Francia",
-            startDate: "20 Ago 2024",
-            endDate: "15 Sep 2024",
-            budget: 3200,
-            spent: 0,
-            status: "planned",
-            progress: 85,
-            image: "🇫🇷"
-        }
-    ])
-
-    const [recentTrips] = useState([
+            title: "Playa Kelingking",
+            location: "Bali, Indonesia",
+            dates: "5 Aug - 12 Aug 2025",
+            rating: 5.0,
+            friends: [
+                { name: "Luis", avatar: "👨‍💼" },
+                { name: "Sofia", avatar: "👩‍💻" },
+                { name: "Diego", avatar: "👨‍🎨" },
+                { name: "Elena", avatar: "👩‍🔬" }
+            ],
+            additionalFriends: 4,
+            image: "🏖️",
+            liked: true
+        },
         {
             id: 3,
-            title: "Costa Rica Adventure",
-            destination: "San José, Costa Rica",
-            completedDate: "Marzo 2024",
-            budget: 1800,
-            spent: 1650,
-            rating: 5,
-            image: "🇨🇷"
+            title: "Mont Saint-Michel",
+            location: "Normandía, Francia",
+            dates: "15 Sep - 25 Sep 2025",
+            rating: 4.6,
+            friends: [
+                { name: "Pierre", avatar: "👨‍🍳" },
+                { name: "Claire", avatar: "👩‍🎭" }
+            ],
+            additionalFriends: 1,
+            image: "🏰",
+            liked: false
         },
         {
             id: 4,
-            title: "NYC Weekend",
-            destination: "Nueva York, USA",
-            completedDate: "Enero 2024",
-            budget: 1200,
-            spent: 1350,
-            rating: 4,
-            image: "🇺🇸"
+            title: "Parque Nacional Plitvice",
+            location: "Plitvička, Jezera, Croacia",
+            dates: "20 Oct - 30 Oct 2025",
+            rating: 4.9,
+            friends: [
+                { name: "Marco", avatar: "👨‍🏫" },
+                { name: "Nina", avatar: "👩‍🎨" }
+            ],
+            additionalFriends: 3,
+            image: "🌊",
+            liked: true
         }
     ])
 
-    const stats = [
-        {
-            label: "Viajes Completados",
-            value: "12",
-            icon: FiMapPin,
-            color: "sage.400",
-            change: "+2 este año"
-        },
-        {
-            label: "Países Visitados",
-            value: "8",
-            icon: FiTrendingUp,
-            color: "blue.400",
-            change: "+1 nuevo"
-        },
-        {
-            label: "Presupuesto Total",
-            value: "$8,450",
-            icon: FiDollarSign,
-            color: "green.400",
-            change: "Bien controlado"
-        },
-        {
-            label: "Fotos Guardadas",
-            value: "247",
-            icon: FiCamera,
-            color: "purple.400",
-            change: "+45 recientes"
-        }
-    ]
+    const [friends] = useState([
+        { name: "Miles Kenner", email: "m.kenner@gmail.com", avatar: "👨‍💼" },
+        { name: "Elise Thornwell", email: "elise.tn@gmail.com", avatar: "👩‍💻" },
+        { name: "Dorian Westbrook", email: "d.westbrook@gmail.com", avatar: "👨‍🎨" },
+        { name: "Grant Holloway", email: "grant.h@gmail.com", avatar: "👨‍🏫" }
+    ])
 
     const handleCreateTrip = () => {
         onNavigate('/create-trip')
     }
 
-    const handleEditTrip = (tripId) => {
-        console.log('Edit trip:', tripId)
-        // TODO: Navegar a editar viaje específico
+    const handleLikeTrip = (tripId) => {
+        console.log('Like trip:', tripId)
     }
 
     const handleViewTrip = (tripId) => {
         console.log('View trip:', tripId)
-        // TODO: Navegar a ver detalles del viaje
     }
 
     return (
-        <Box minH="100vh" bg="gray.50">
-            {/* Navbar */}
-            <Navbar
-                user={user}
-                onNavigate={onNavigate}
-                onLogout={onLogout}
-            />
-
-            {/* Layout con Sidebar */}
-            <Flex>
-                {/* Sidebar - Solo en desktop */}
-                <Sidebar
-                    currentRoute="/dashboard"
-                    onNavigate={onNavigate}
-                />
-
-                {/* Contenido Principal */}
-                <Box
-                    flex={1}
-                    ml={{ base: 0, lg: "280px" }} // Margen izquierdo igual al ancho del sidebar
-                    transition="margin-left 0.2s"
-                >
-                    <Container maxW="6xl" py={8} px={{ base: 4, md: 8 }}>
+        <Container maxW="full" py={8} px={{ base: 4, md: 8, lg: 16, xl: 20 }}>
+            <Box maxW="1400px" mx="auto" pl={{ base: 0, lg: 20 }}>
+                <Grid templateColumns={{ base: "1fr", xl: "1fr 300px" }} gap={8}>
+                    {/* Columna Principal */}
+                    <GridItem>
                         <VStack spacing={8} align="stretch">
                             {/* Welcome Section */}
                             <VStack spacing={4} align="start">
@@ -163,7 +177,7 @@ const DashboardPage = ({ onNavigate, onLogout, user }) => {
                                     ¡Hola, {user?.firstName || "Juan"}! 👋
                                 </Heading>
                                 <Text color="gray.600" fontSize="lg">
-                                    Tienes 2 viajes activos y muchas aventuras por delante.
+                                    Explora tus rutas de viaje favoritas
                                 </Text>
                             </VStack>
 
@@ -172,207 +186,275 @@ const DashboardPage = ({ onNavigate, onLogout, user }) => {
                                 {stats.map((stat, index) => (
                                     <Card key={index} bg="white" _hover={{ transform: "translateY(-2px)", shadow: "lg" }} transition="all 0.2s">
                                         <CardBody p={6}>
-                                            <VStack spacing={4} align="start">
-                                                <HStack justify="space-between" w="full">
+                                            <HStack justify="space-between" mb={4}>
+                                                <Text fontSize="sm" color="gray.500" fontWeight="500">
+                                                    {stat.label}
+                                                </Text>
+                                                <IconButton
+                                                    icon={<FiMoreVertical />}
+                                                    size="xs"
+                                                    variant="ghost"
+                                                    color="gray.400"
+                                                />
+                                            </HStack>
+                                            <VStack spacing={2} align="start">
+                                                <Text fontSize="2xl" fontWeight="700" color="gray.800">
+                                                    {stat.value}
+                                                </Text>
+                                                <HStack spacing={1}>
                                                     <Icon
-                                                        as={stat.icon}
-                                                        boxSize={6}
-                                                        color={stat.color}
-                                                        p={1}
-                                                        bg={`${stat.color.split('.')[0]}.50`}
-                                                        borderRadius="lg"
+                                                        as={stat.trend === 'up' ? FiArrowUp : FiArrowDown}
+                                                        color={stat.trend === 'up' ? 'green.500' : 'red.500'}
+                                                        boxSize={3}
                                                     />
-                                                    <Text fontSize="2xl" fontWeight="bold" color="gray.800">
-                                                        {stat.value}
-                                                    </Text>
-                                                </HStack>
-                                                <VStack spacing={1} align="start">
-                                                    <Text fontSize="sm" color="gray.600" fontWeight="500">
-                                                        {stat.label}
-                                                    </Text>
-                                                    <Text fontSize="xs" color="gray.500">
+                                                    <Text
+                                                        fontSize="xs"
+                                                        color={stat.trend === 'up' ? 'green.500' : 'red.500'}
+                                                        fontWeight="500"
+                                                    >
                                                         {stat.change}
                                                     </Text>
-                                                </VStack>
+                                                </HStack>
                                             </VStack>
                                         </CardBody>
                                     </Card>
                                 ))}
                             </SimpleGrid>
 
-                            {/* Active Trips */}
+                            {/* Map Section */}
+                            <Card bg="white">
+                                <CardBody p={8}>
+                                    <Flex
+                                        h="300px"
+                                        align="center"
+                                        justify="center"
+                                        bg="gray.50"
+                                        borderRadius="xl"
+                                        border="2px dashed"
+                                        borderColor="gray.200"
+                                    >
+                                        <VStack spacing={4}>
+                                            <Icon as={FiMapPin} boxSize={12} color="gray.400" />
+                                            <VStack spacing={2}>
+                                                <Text fontSize="lg" fontWeight="600" color="gray.600">
+                                                    Mapa Próximamente
+                                                </Text>
+                                                <Text fontSize="sm" color="gray.500" textAlign="center">
+                                                    Aquí podrás ver todas tus rutas de viaje en un mapa interactivo
+                                                </Text>
+                                            </VStack>
+                                        </VStack>
+                                    </Flex>
+                                </CardBody>
+                            </Card>
+
+                            {/* Upcoming Trips */}
                             <VStack spacing={6} align="stretch">
                                 <HStack justify="space-between">
-                                    <Heading size="lg" color="gray.800" fontWeight="600">
-                                        Viajes Activos
+                                    <Heading size="md" color="gray.800">
+                                        Próximos viajes
                                     </Heading>
                                     <Button
-                                        leftIcon={<FiPlus />}
-                                        bg="sage.400"
-                                        color="white"
-                                        _hover={{ bg: "sage.500", transform: "translateY(-1px)" }}
-                                        onClick={handleCreateTrip}
-                                        borderRadius="12px"
-                                        size="md"
+                                        size="sm"
+                                        variant="ghost"
+                                        colorScheme="sage"
+                                        rightIcon={<Icon as={FiEye} />}
                                     >
-                                        Nuevo Viaje
+                                        Ver todos
                                     </Button>
                                 </HStack>
 
-                                <SimpleGrid columns={{ base: 1, xl: 2 }} spacing={6}>
-                                    {activeTrips.map((trip) => (
-                                        <Card key={trip.id} bg="white" _hover={{ shadow: "lg" }} transition="all 0.2s">
-                                            <CardBody p={6}>
-                                                <VStack spacing={4} align="stretch">
-                                                    {/* Trip Header */}
-                                                    <HStack justify="space-between">
-                                                        <HStack spacing={3}>
-                                                            <Text fontSize="2xl">{trip.image}</Text>
-                                                            <VStack spacing={0} align="start">
-                                                                <Heading size="md" color="gray.800">
-                                                                    {trip.title}
-                                                                </Heading>
-                                                                <Text fontSize="sm" color="gray.500">
-                                                                    {trip.destination}
-                                                                </Text>
-                                                            </VStack>
-                                                        </HStack>
-                                                        <Menu>
-                                                            <MenuButton as={IconButton} icon={<FiMoreVertical />} variant="ghost" size="sm" />
-                                                            <MenuList>
-                                                                <MenuItem icon={<FiEdit />} onClick={() => handleEditTrip(trip.id)}>
-                                                                    Editar
-                                                                </MenuItem>
-                                                                <MenuItem icon={<FiTrash2 />} color="red.500">
-                                                                    Eliminar
-                                                                </MenuItem>
-                                                            </MenuList>
-                                                        </Menu>
-                                                    </HStack>
-
-                                                    {/* Trip Status */}
-                                                    <HStack>
-                                                        <Badge
-                                                            colorScheme={trip.status === 'active' ? 'green' : 'blue'}
-                                                            variant="subtle"
-                                                            borderRadius="full"
-                                                            px={3}
-                                                            py={1}
-                                                        >
-                                                            {trip.status === 'active' ? 'En progreso' : 'Planificado'}
-                                                        </Badge>
-                                                        <Text fontSize="sm" color="gray.500">
-                                                            {trip.startDate} - {trip.endDate}
-                                                        </Text>
-                                                    </HStack>
-
-                                                    {/* Budget Progress */}
-                                                    <VStack spacing={2} align="stretch">
-                                                        <HStack justify="space-between">
-                                                            <Text fontSize="sm" color="gray.600" fontWeight="500">
-                                                                Presupuesto
-                                                            </Text>
-                                                            <Text fontSize="sm" color="gray.800" fontWeight="600">
-                                                                ${trip.spent} / ${trip.budget}
-                                                            </Text>
-                                                        </HStack>
-                                                        <Progress
-                                                            value={(trip.spent / trip.budget) * 100}
-                                                            colorScheme={trip.spent > trip.budget ? "red" : "sage"}
-                                                            borderRadius="full"
-                                                            size="sm"
-                                                        />
-                                                    </VStack>
-
-                                                    {/* Planning Progress */}
-                                                    <VStack spacing={2} align="stretch">
-                                                        <HStack justify="space-between">
-                                                            <Text fontSize="sm" color="gray.600" fontWeight="500">
-                                                                Planificación
-                                                            </Text>
-                                                            <Text fontSize="sm" color="gray.800" fontWeight="600">
-                                                                {trip.progress}%
-                                                            </Text>
-                                                        </HStack>
-                                                        <Progress
-                                                            value={trip.progress}
-                                                            colorScheme="blue"
-                                                            borderRadius="full"
-                                                            size="sm"
-                                                        />
-                                                    </VStack>
-
-                                                    {/* Actions */}
-                                                    <Button
-                                                        w="full"
-                                                        variant="outline"
-                                                        borderColor="sage.200"
-                                                        color="sage.600"
-                                                        _hover={{ bg: "sage.50", borderColor: "sage.300" }}
-                                                        onClick={() => handleViewTrip(trip.id)}
-                                                        borderRadius="12px"
+                                <SimpleGrid columns={{ base: 1, md: 2 }} spacing={6}>
+                                    {upcomingTrips.map((trip) => (
+                                        <Card key={trip.id} bg="white" _hover={{ transform: "translateY(-2px)", shadow: "lg" }} transition="all 0.2s">
+                                            <CardBody p={0}>
+                                                <Box position="relative">
+                                                    {/* Trip Image Placeholder */}
+                                                    <Flex
+                                                        h="160px"
+                                                        align="center"
+                                                        justify="center"
+                                                        bg="gradient-to-br"
+                                                        bgGradient={`linear(to-br, ${trip.id % 2 === 0 ? 'blue.400, purple.600' : 'orange.400, red.600'})`}
+                                                        borderTopRadius="xl"
+                                                        color="white"
+                                                        fontSize="4xl"
                                                     >
-                                                        Ver Detalles
-                                                    </Button>
+                                                        {trip.image}
+                                                    </Flex>
+
+                                                    {/* Like Button */}
+                                                    <IconButton
+                                                        icon={<FiHeart />}
+                                                        size="sm"
+                                                        variant="solid"
+                                                        bg={trip.liked ? "red.500" : "white"}
+                                                        color={trip.liked ? "white" : "gray.600"}
+                                                        position="absolute"
+                                                        top={4}
+                                                        right={4}
+                                                        borderRadius="full"
+                                                        _hover={{
+                                                            bg: trip.liked ? "red.600" : "gray.100"
+                                                        }}
+                                                        onClick={() => handleLikeTrip(trip.id)}
+                                                    />
+                                                </Box>
+
+                                                <VStack spacing={4} p={6} align="stretch">
+                                                    <VStack spacing={2} align="start">
+                                                        <Text fontSize="lg" fontWeight="600" color="gray.800">
+                                                            {trip.title}
+                                                        </Text>
+                                                        <Text fontSize="sm" color="gray.500">
+                                                            {trip.location}
+                                                        </Text>
+                                                        <Text fontSize="sm" color="gray.600">
+                                                            {trip.dates}
+                                                        </Text>
+                                                    </VStack>
+
+                                                    <HStack justify="space-between">
+                                                        <HStack spacing={2}>
+                                                            <AvatarGroup size="sm" max={3}>
+                                                                {trip.friends.map((friend, idx) => (
+                                                                    <Avatar
+                                                                        key={idx}
+                                                                        name={friend.name}
+                                                                        bg="sage.400"
+                                                                        color="white"
+                                                                        size="sm"
+                                                                    />
+                                                                ))}
+                                                            </AvatarGroup>
+                                                            {trip.additionalFriends > 0 && (
+                                                                <Text fontSize="xs" color="gray.500">
+                                                                    + {trip.additionalFriends} amigos
+                                                                </Text>
+                                                            )}
+                                                        </HStack>
+
+                                                        <HStack spacing={1}>
+                                                            <Icon as={FiStar} color="yellow.400" boxSize={4} />
+                                                            <Text fontSize="sm" fontWeight="600" color="gray.700">
+                                                                {trip.rating}
+                                                            </Text>
+                                                        </HStack>
+                                                    </HStack>
                                                 </VStack>
                                             </CardBody>
                                         </Card>
                                     ))}
                                 </SimpleGrid>
                             </VStack>
+                        </VStack>
+                    </GridItem>
 
-                            {/* Recent Trips */}
-                            <VStack spacing={6} align="stretch">
-                                <Heading size="lg" color="gray.800" fontWeight="600">
-                                    Viajes Recientes
-                                </Heading>
+                    {/* Sidebar Derecha */}
+                    <GridItem display={{ base: "none", xl: "block" }}>
+                        <VStack spacing={6} align="stretch">
+                            {/* Calendar Widget */}
+                            <Card bg="white">
+                                <CardBody p={6}>
+                                    <VStack spacing={4} align="stretch">
+                                        <HStack justify="space-between">
+                                            <Text fontSize="lg" fontWeight="600" color="gray.800">
+                                                Mayo 2025
+                                            </Text>
+                                            <HStack>
+                                                <IconButton icon={<Text>‹</Text>} size="sm" variant="ghost" />
+                                                <IconButton icon={<Text>›</Text>} size="sm" variant="ghost" />
+                                            </HStack>
+                                        </HStack>
 
-                                <SimpleGrid columns={{ base: 1, md: 2 }} spacing={6}>
-                                    {recentTrips.map((trip) => (
-                                        <Card key={trip.id} bg="white" _hover={{ shadow: "md" }} transition="all 0.2s">
-                                            <CardBody p={6}>
-                                                <HStack spacing={4}>
-                                                    <Text fontSize="3xl">{trip.image}</Text>
-                                                    <VStack spacing={2} align="start" flex={1}>
-                                                        <VStack spacing={0} align="start">
-                                                            <Heading size="sm" color="gray.800">
-                                                                {trip.title}
-                                                            </Heading>
-                                                            <Text fontSize="sm" color="gray.500">
-                                                                {trip.destination}
-                                                            </Text>
-                                                        </VStack>
-                                                        <HStack spacing={2}>
-                                                            <Badge colorScheme="gray" variant="subtle" borderRadius="full">
-                                                                {trip.completedDate}
-                                                            </Badge>
-                                                            <HStack spacing={1}>
-                                                                {[...Array(5)].map((_, i) => (
-                                                                    <Box
-                                                                        key={i}
-                                                                        w={3}
-                                                                        h={3}
-                                                                        borderRadius="full"
-                                                                        bg={i < trip.rating ? "yellow.400" : "gray.200"}
-                                                                    />
-                                                                ))}
-                                                            </HStack>
-                                                        </HStack>
+                                        {/* Calendar Grid */}
+                                        <SimpleGrid columns={7} spacing={1} fontSize="sm">
+                                            {['Lu', 'Ma', 'Mi', 'Ju', 'Vi', 'Sa', 'Do'].map(day => (
+                                                <Text key={day} textAlign="center" color="gray.500" fontWeight="500" py={2}>
+                                                    {day}
+                                                </Text>
+                                            ))}
+                                            {Array.from({length: 31}, (_, i) => (
+                                                <Flex
+                                                    key={i}
+                                                    align="center"
+                                                    justify="center"
+                                                    h={8}
+                                                    w={8}
+                                                    borderRadius="md"
+                                                    bg={[4, 7, 20].includes(i + 1) ? "sage.400" : "transparent"}
+                                                    color={[4, 7, 20].includes(i + 1) ? "white" : "gray.700"}
+                                                    cursor="pointer"
+                                                    _hover={{ bg: [4, 7, 20].includes(i + 1) ? "sage.500" : "gray.100" }}
+                                                >
+                                                    {i + 1}
+                                                </Flex>
+                                            ))}
+                                        </SimpleGrid>
+
+                                        <Divider />
+
+                                        <VStack spacing={3}>
+                                            <HStack spacing={3} w="full">
+                                                <Box w={3} h={3} bg="sage.400" borderRadius="full" />
+                                                <Text fontSize="sm" color="gray.600">2 eventos</Text>
+                                            </HStack>
+                                            <HStack spacing={3} w="full">
+                                                <Box w={3} h={3} bg="blue.400" borderRadius="full" />
+                                                <Text fontSize="sm" color="gray.600">1 nueva invitación</Text>
+                                            </HStack>
+                                        </VStack>
+                                    </VStack>
+                                </CardBody>
+                            </Card>
+
+                            {/* Friends List */}
+                            <Card bg="white">
+                                <CardBody p={6}>
+                                    <VStack spacing={4} align="stretch">
+                                        <HStack justify="space-between">
+                                            <Text fontSize="lg" fontWeight="600" color="gray.800">
+                                                Mis amigos
+                                            </Text>
+                                            <Button size="sm" variant="ghost" colorScheme="sage">
+                                                Ver todos
+                                            </Button>
+                                        </HStack>
+
+                                        <VStack spacing={4}>
+                                            {friends.map((friend, index) => (
+                                                <HStack key={index} spacing={3} w="full">
+                                                    <Avatar
+                                                        name={friend.name}
+                                                        bg="sage.400"
+                                                        color="white"
+                                                        size="sm"
+                                                    />
+                                                    <VStack spacing={0} align="start" flex={1}>
+                                                        <Text fontSize="sm" fontWeight="500" color="gray.800">
+                                                            {friend.name}
+                                                        </Text>
                                                         <Text fontSize="xs" color="gray.500">
-                                                            ${trip.spent} de ${trip.budget}
+                                                            {friend.email}
                                                         </Text>
                                                     </VStack>
+                                                    <IconButton
+                                                        icon={<FiUsers />}
+                                                        size="sm"
+                                                        variant="ghost"
+                                                        color="gray.400"
+                                                    />
                                                 </HStack>
-                                            </CardBody>
-                                        </Card>
-                                    ))}
-                                </SimpleGrid>
-                            </VStack>
+                                            ))}
+                                        </VStack>
+                                    </VStack>
+                                </CardBody>
+                            </Card>
                         </VStack>
-                    </Container>
-                </Box>
-            </Flex>
-        </Box>
+                    </GridItem>
+                </Grid>
+            </Box>
+        </Container>
     )
 }
 

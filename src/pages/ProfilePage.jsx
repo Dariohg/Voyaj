@@ -1,5 +1,4 @@
 import {
-    Box,
     Container,
     VStack,
     Heading,
@@ -8,47 +7,37 @@ import {
     Button
 } from '@chakra-ui/react'
 import { FiUser, FiArrowLeft } from 'react-icons/fi'
-import Navbar from '../components/Navbar'
 
 const ProfilePage = ({ onNavigate, onLogout, user }) => {
     return (
-        <Box minH="100vh" bg="gray.50">
-            <Navbar
-                user={user}
-                onNavigate={onNavigate}
-                onLogout={onLogout}
-                currentRoute="/profile"
-            />
+        <Container maxW="7xl" py={12}>
+            <VStack spacing={8} textAlign="center">
+                <Icon as={FiUser} boxSize={20} color="sage.300" />
 
-            <Container maxW="7xl" py={12}>
-                <VStack spacing={8} textAlign="center">
-                    <Icon as={FiUser} boxSize={20} color="sage.300" />
-
-                    <VStack spacing={4}>
-                        <Heading size="xl" color="gray.800">
-                            Mi Perfil
-                        </Heading>
-                        <Text fontSize="lg" color="gray.600" maxW="md">
-                            Gestiona tu información personal, preferencias de viaje,
-                            configuración de privacidad y plan de suscripción.
-                        </Text>
-                    </VStack>
-
-                    <VStack spacing={4}>
-                        <Text fontSize="sm" color="gray.500">
-                            🚧 Página en construcción 🚧
-                        </Text>
-                        <Button
-                            leftIcon={<FiArrowLeft />}
-                            variant="outline"
-                            onClick={() => onNavigate('/dashboard')}
-                        >
-                            Volver al Dashboard
-                        </Button>
-                    </VStack>
+                <VStack spacing={4}>
+                    <Heading size="xl" color="gray.800">
+                        Mi Perfil
+                    </Heading>
+                    <Text fontSize="lg" color="gray.600" maxW="md">
+                        Gestiona tu información personal, preferencias de viaje,
+                        configuración de privacidad y plan de suscripción.
+                    </Text>
                 </VStack>
-            </Container>
-        </Box>
+
+                <VStack spacing={4}>
+                    <Text fontSize="sm" color="gray.500">
+                        🚧 Página en construcción 🚧
+                    </Text>
+                    <Button
+                        leftIcon={<FiArrowLeft />}
+                        variant="outline"
+                        onClick={() => onNavigate('/dashboard')}
+                    >
+                        Volver al Dashboard
+                    </Button>
+                </VStack>
+            </VStack>
+        </Container>
     )
 }
 

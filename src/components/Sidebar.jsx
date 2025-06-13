@@ -1,12 +1,19 @@
 import {
     Box,
     VStack,
-    HStack,
     Text,
     Icon,
     Button,
     Divider,
-    useBreakpointValue
+    useBreakpointValue,
+    Drawer,
+    DrawerBody,
+    DrawerHeader,
+    DrawerOverlay,
+    DrawerContent,
+    DrawerCloseButton,
+    Tooltip,
+    HStack
 } from '@chakra-ui/react'
 import {
     FiHome,
@@ -18,131 +25,176 @@ import {
     FiSettings
 } from 'react-icons/fi'
 
-const Sidebar = ({ currentRoute, onNavigate }) => {
+const Sidebar = ({ currentRoute, onNavigate, isOpen = false, onClose }) => {
     const isMobile = useBreakpointValue({ base: true, lg: false })
 
-    // Si es móvil, no mostrar sidebar (se puede implementar como drawer después)
-    if (isMobile) return null
-
     const navigationItems = [
-        { icon: FiHome, label: 'Dashboard', route: '/dashboard', section: 'main' },
-        { icon: FiPlus, label: 'Nuevo Viaje', route: '/create-trip', section: 'main' },
-        { icon: FiCalendar, label: 'Mis Viajes', route: '/my-trips', section: 'main' },
-        { icon: FiCamera, label: 'Fotos', route: '/photos', section: 'main' },
-        { icon: FiBarChart2, label: 'Estadísticas', route: '/stats', section: 'main' },
+        { icon: FiHome, label: 'Dashboard', route: '/dashboard' },
+        { icon: FiPlus, label: 'Nuevo Viaje', route: '/create-trip' },
+        { icon: FiCalendar, label: 'Mis Viajes', route: '/my-trips' },
+        { icon: FiCamera, label: 'Fotos', route: '/photos' },
+        { icon: FiBarChart2, label: 'Estadísticas', route: '/stats' },
     ]
 
     const secondaryItems = [
-        { icon: FiUser, label: 'Mi Perfil', route: '/profile', section: 'secondary' },
-        { icon: FiSettings, label: 'Configuración', route: '/settings', section: 'secondary' },
+        { icon: FiUser, label: 'Mi Perfil', route: '/profile' },
+        { icon: FiSettings, label: 'Configuración', route: '/settings' },
     ]
 
     const handleNavigation = (route) => {
         onNavigate(route)
+        if (isMobile && onClose) {
+            onClose()
+        }
     }
 
     const isActive = (route) => currentRoute === route
 
+    // Botón con diseño de isla para desktop
+    const renderFloatingButton = (item) => (
+        <Tooltip
+            key={item.route}
+            label={item.label}
+            placement="right"
+            hasArrow
+            bg="gray.800"
+            color="white"
+            fontSize="sm"
+            px={3}
+            py={2}
+            borderRadius="md"
+        >
+            <Box
+                as="button"
+                onClick={() => handleNavigation(item.route)}
+                w={12}
+                h={12}
+                display="flex"
+                alignItems="center"
+                justifyContent="center"
+                bg={isActive(item.route) ? "sage.400" : "white"}
+                color={isActive(item.route) ? "white" : "gray.600"}
+                borderRadius="full"
+                boxShadow={isActive(item.route) ? "lg" : "md"}
+                border="1px"
+                borderColor={isActive(item.route) ? "sage.400" : "gray.200"}
+                transition="all 0.3s ease"
+                _hover={{
+                    bg: isActive(item.route) ? "sage.500" : "gray.50",
+                    transform: "translateY(-2px)",
+                    boxShadow: "xl",
+                    borderColor: isActive(item.route) ? "sage.500" : "gray.300",
+                }}
+                _active={{
+                    transform: "translateY(0px)",
+                }}
+            >
+                <Icon as={item.icon} boxSize={5} />
+            </Box>
+        </Tooltip>
+    )
+
+    // Botón normal para móvil (drawer)
+    const renderMobileButton = (item) => (
+        <Button
+            key={item.route}
+            variant="ghost"
+            bg={isActive(item.route) ? "sage.400" : "white"}
+            color={isActive(item.route) ? "white" : "gray.700"}
+            leftIcon={<Icon as={item.icon} boxSize={5} color={isActive(item.route) ? "white" : "gray.600"} />}
+            onClick={() => handleNavigation(item.route)}
+            justifyContent="flex-start"
+            w="full"
+            h={12}
+            fontWeight={isActive(item.route) ? "600" : "500"}
+            _hover={{
+                bg: isActive(item.route) ? "sage.500" : "gray.50",
+                color: isActive(item.route) ? "white" : "gray.800",
+            }}
+            transition="all 0.2s"
+            borderRadius="8px"
+            border="none"
+        >
+            {item.label}
+        </Button>
+    )
+
+    // Contenido para móvil (drawer)
+    const mobileContent = (
+        <VStack spacing={6} align="stretch" w="full">
+            <Box>
+                <Text fontSize="xs" fontWeight="600" color="gray.500" uppercase tracking="wider" mb={4}>
+                    Navegación
+                </Text>
+                <VStack spacing={2} align="stretch">
+                    {navigationItems.map(renderMobileButton)}
+                </VStack>
+            </Box>
+
+            <Divider />
+
+            <Box>
+                <Text fontSize="xs" fontWeight="600" color="gray.500" uppercase tracking="wider" mb={4}>
+                    Cuenta
+                </Text>
+                <VStack spacing={2} align="stretch">
+                    {secondaryItems.map(renderMobileButton)}
+                </VStack>
+            </Box>
+        </VStack>
+    )
+
+    // MOBILE: Drawer
+    if (isMobile) {
+        return (
+            <Drawer
+                isOpen={isOpen}
+                placement="left"
+                onClose={onClose}
+                size="sm"
+            >
+                <DrawerOverlay bg="blackAlpha.600" />
+                <DrawerContent maxW="280px" bg="white">
+                    <DrawerCloseButton color="gray.600" />
+                    <DrawerHeader borderBottomWidth="1px" borderColor="gray.200" pb={4} bg="white">
+                        <Text fontSize="lg" fontWeight="600" color="sage.400">
+                            Voyaj
+                        </Text>
+                    </DrawerHeader>
+                    <DrawerBody p={6} bg="white">
+                        {mobileContent}
+                    </DrawerBody>
+                </DrawerContent>
+            </Drawer>
+        )
+    }
+
+    // DESKTOP: Sidebar flotante con iconos
     return (
         <Box
-            w="280px"
-            minH="calc(100vh - 81px)" // Altura total menos el navbar
-            bg="white"
-            borderRight="1px"
-            borderColor="gray.200"
             position="fixed"
-            left={0}
-            top="81px" // Altura del navbar
-            p={6}
-            overflowY="auto"
+            left={6}
+            top="120px" // Alineado con el contenido principal
+            zIndex={10}
+            bg="transparent"
         >
-            <VStack spacing={6} align="stretch">
+            <VStack
+                spacing={4}
+                p={4}
+                bg="white"
+                borderRadius="2xl"
+                boxShadow="2xl"
+                border="1px"
+                borderColor="gray.100"
+            >
                 {/* Navegación Principal */}
-                <VStack spacing={2} align="stretch">
-                    <Text fontSize="xs" fontWeight="600" color="gray.500" uppercase tracking="wider" mb={2}>
-                        Navegación
-                    </Text>
-                    {navigationItems.map((item) => (
-                        <Button
-                            key={item.route}
-                            variant={isActive(item.route) ? "solid" : "ghost"}
-                            colorScheme={isActive(item.route) ? "sage" : "gray"}
-                            leftIcon={<Icon as={item.icon} boxSize={5} />}
-                            onClick={() => handleNavigation(item.route)}
-                            justifyContent="flex-start"
-                            h={12}
-                            fontWeight={isActive(item.route) ? "600" : "500"}
-                            _hover={{
-                                bg: isActive(item.route) ? "sage.500" : "gray.100",
-                                transform: "translateX(4px)",
-                            }}
-                            transition="all 0.2s"
-                            borderRadius="12px"
-                        >
-                            {item.label}
-                        </Button>
-                    ))}
-                </VStack>
+                {navigationItems.map(renderFloatingButton)}
 
-                <Divider />
+                {/* Divider flotante */}
+                <Box w={8} h="1px" bg="gray.200" />
 
                 {/* Configuración */}
-                <VStack spacing={2} align="stretch">
-                    <Text fontSize="xs" fontWeight="600" color="gray.500" uppercase tracking="wider" mb={2}>
-                        Cuenta
-                    </Text>
-                    {secondaryItems.map((item) => (
-                        <Button
-                            key={item.route}
-                            variant={isActive(item.route) ? "solid" : "ghost"}
-                            colorScheme={isActive(item.route) ? "sage" : "gray"}
-                            leftIcon={<Icon as={item.icon} boxSize={5} />}
-                            onClick={() => handleNavigation(item.route)}
-                            justifyContent="flex-start"
-                            h={12}
-                            fontWeight={isActive(item.route) ? "600" : "500"}
-                            _hover={{
-                                bg: isActive(item.route) ? "sage.500" : "gray.100",
-                                transform: "translateX(4px)",
-                            }}
-                            transition="all 0.2s"
-                            borderRadius="12px"
-                        >
-                            {item.label}
-                        </Button>
-                    ))}
-                </VStack>
-
-                {/* Espacio para futuras secciones */}
-                <Box flex={1} />
-
-                {/* Footer del Sidebar */}
-                <Box
-                    p={4}
-                    bg="sage.50"
-                    borderRadius="12px"
-                    border="1px"
-                    borderColor="sage.100"
-                >
-                    <VStack spacing={2}>
-                        <Text fontSize="sm" fontWeight="600" color="sage.700" textAlign="center">
-                            ¿Necesitas ayuda?
-                        </Text>
-                        <Text fontSize="xs" color="sage.600" textAlign="center">
-                            Consulta nuestra guía de usuario para sacar el máximo provecho a Voyaj.
-                        </Text>
-                        <Button
-                            size="sm"
-                            variant="outline"
-                            borderColor="sage.200"
-                            color="sage.600"
-                            _hover={{ bg: "sage.100" }}
-                            w="full"
-                        >
-                            Ver Guía
-                        </Button>
-                    </VStack>
-                </Box>
+                {secondaryItems.map(renderFloatingButton)}
             </VStack>
         </Box>
     )

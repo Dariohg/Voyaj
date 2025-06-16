@@ -1,24 +1,17 @@
+// src/App.jsx
 import { ChakraProvider, ColorModeScript } from '@chakra-ui/react'
 import { useState, useEffect } from 'react'
 import theme from './styles/theme'
-import AppLayout from './components/AppLayout'
-import LandingPage from './pages/LandingPage'
-import LoginPage from './pages/LoginPage'
-import RegisterPage from './pages/RegisterPage'
-import DashboardPage from './pages/DashboardPage'
-import CreateTripPage from './pages/CreateTripPage'
-import MyTripsPage from './pages/MyTripsPage'
-import PhotosPage from './pages/PhotosPage'
-import StatsPage from './pages/StatsPage'
-import ProfilePage from './pages/ProfilePage'
-import SettingsPage from './pages/SettingsPage'
+import { useRouter } from './router/Router'
+import { RouteRenderer } from './router/RouteRenderer'
+import { routes } from './router/routes'
 
 function App() {
-    const [currentRoute, setCurrentRoute] = useState('/')
+    const { currentRoute, routeParams, navigate, isLoading: routerLoading } = useRouter()
     const [user, setUser] = useState(null)
-    const [isLoading, setIsLoading] = useState(true) // Estado de carga inicial
+    const [isUserLoading, setIsUserLoading] = useState(true)
 
-    // Función para guardar usuario en localStorage
+    // Funciones de gestión de usuario
     const saveUserToStorage = (userData) => {
         try {
             localStorage.setItem('voyaj_user', JSON.stringify(userData))
@@ -28,7 +21,6 @@ function App() {
         }
     }
 
-    // Función para obtener usuario de localStorage
     const getUserFromStorage = () => {
         try {
             const savedUser = localStorage.getItem('voyaj_user')
@@ -43,7 +35,6 @@ function App() {
         return null
     }
 
-    // Función para limpiar sesión
     const clearUserFromStorage = () => {
         try {
             localStorage.removeItem('voyaj_user')
@@ -53,26 +44,18 @@ function App() {
         }
     }
 
-    // Función para navegar y actualizar la URL
-    const navigate = (path) => {
-        setCurrentRoute(path)
-        window.history.pushState({}, '', path)
-    }
-
-    // Función para simular login
     const handleLogin = (userData) => {
         console.log('Login successful with user:', userData)
         setUser(userData)
-        saveUserToStorage(userData) // Guardar en localStorage
-        navigate('/dashboard')
+        saveUserToStorage(userData)
+        navigate(routes.DASHBOARD)
     }
 
-    // Función para logout
     const handleLogout = () => {
         console.log('Logging out user')
         setUser(null)
-        clearUserFromStorage() // Limpiar localStorage
-        navigate('/')
+        clearUserFromStorage()
+        navigate(routes.HOME)
     }
 
     // Cargar usuario al iniciar la aplicación
@@ -80,32 +63,16 @@ function App() {
         const savedUser = getUserFromStorage()
         if (savedUser) {
             setUser(savedUser)
-            // Si hay usuario guardado y estamos en ruta pública, ir al dashboard
-            if (currentRoute === '/' || currentRoute === '/login' || currentRoute === '/register') {
-                setCurrentRoute('/dashboard')
-                window.history.replaceState({}, '', '/dashboard')
-            }
         }
-        setIsLoading(false) // Terminar carga inicial
-    }, [])
+        setIsUserLoading(false)
+    }, []) // ← SIN DEPENDENCIAS para que solo se ejecute una vez
 
-    // Escuchar cambios en el historial del navegador (botón atrás/adelante)
+    // Manejar redirección cuando hay usuario y está en ruta pública
     useEffect(() => {
-        const handlePopState = () => {
-            setCurrentRoute(window.location.pathname)
+        if (user && !routerLoading && (currentRoute === routes.HOME || currentRoute === routes.LOGIN || currentRoute === routes.REGISTER)) {
+            navigate(routes.DASHBOARD)
         }
-
-        // Establecer ruta inicial basada en la URL actual
-        if (!isLoading) {
-            setCurrentRoute(window.location.pathname)
-        }
-
-        window.addEventListener('popstate', handlePopState)
-
-        return () => {
-            window.removeEventListener('popstate', handlePopState)
-        }
-    }, [isLoading])
+    }, [user, currentRoute, routerLoading]) // ← Solo cuando cambie el usuario o la ruta
 
     // FORZAR MODO CLARO - Prevenir que el sistema cambie el tema
     useEffect(() => {
@@ -125,16 +92,8 @@ function App() {
         }
     }, [])
 
-    // Función para verificar si el usuario está autenticado
-    const requireAuth = (component) => {
-        if (!user) {
-            return <LoginPage onNavigate={navigate} onLogin={handleLogin} />
-        }
-        return component
-    }
-
-    // Mostrar loading mientras se carga la sesión
-    if (isLoading) {
+    // Mostrar loading mientras se carga la sesión o el router
+    if (routerLoading || isUserLoading) {
         return (
             <ChakraProvider theme={theme}>
                 <div style={{
@@ -155,83 +114,22 @@ function App() {
 
     // Debug: log current state
     console.log('Current route:', currentRoute)
+    console.log('Route params:', routeParams)
     console.log('User:', user)
-
-    // Función para renderizar la página actual
-    const renderPageContent = () => {
-        switch (currentRoute) {
-            case '/dashboard':
-                return requireAuth(
-                    <DashboardPage onNavigate={navigate} onLogout={handleLogout} user={user} />
-                )
-            case '/create-trip':
-                return requireAuth(
-                    <CreateTripPage onNavigate={navigate} onLogout={handleLogout} user={user} />
-                )
-            case '/my-trips':
-                return requireAuth(
-                    <MyTripsPage onNavigate={navigate} onLogout={handleLogout} user={user} />
-                )
-            case '/photos':
-                return requireAuth(
-                    <PhotosPage onNavigate={navigate} onLogout={handleLogout} user={user} />
-                )
-            case '/stats':
-                return requireAuth(
-                    <StatsPage onNavigate={navigate} onLogout={handleLogout} user={user} />
-                )
-            case '/profile':
-                return requireAuth(
-                    <ProfilePage onNavigate={navigate} onLogout={handleLogout} user={user} />
-                )
-            case '/settings':
-                return requireAuth(
-                    <SettingsPage onNavigate={navigate} onLogout={handleLogout} user={user} />
-                )
-            default:
-                return null
-        }
-    }
-
-    const renderCurrentPage = () => {
-        // Páginas públicas sin layout
-        switch (currentRoute) {
-            case '/login':
-                return <LoginPage onNavigate={navigate} onLogin={handleLogin} />
-            case '/register':
-                return <RegisterPage onNavigate={navigate} onLogin={handleLogin} />
-            case '/':
-            default:
-                { if (currentRoute === '/') {
-                    return <LandingPage onNavigate={navigate} />
-                }
-
-                // Páginas autenticadas con layout
-                const pageContent = renderPageContent()
-                if (pageContent && user) {
-                    return (
-                        <AppLayout
-                            user={user}
-                            onNavigate={navigate}
-                            onLogout={handleLogout}
-                            currentRoute={currentRoute}
-                        >
-                            {pageContent}
-                        </AppLayout>
-                    )
-                }
-
-                // Si no hay usuario y no es página pública, mostrar login
-                return <LoginPage onNavigate={navigate} onLogin={handleLogin} /> }
-        }
-    }
 
     return (
         <>
             {/* Script para forzar modo claro desde el inicio */}
             <ColorModeScript initialColorMode={theme.config.initialColorMode} />
             <ChakraProvider theme={theme}>
-                {renderCurrentPage()}
+                <RouteRenderer
+                    currentRoute={currentRoute}
+                    routeParams={routeParams}
+                    user={user}
+                    navigate={navigate}
+                    onLogin={handleLogin}
+                    onLogout={handleLogout}
+                />
             </ChakraProvider>
         </>
     )

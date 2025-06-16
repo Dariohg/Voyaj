@@ -161,7 +161,7 @@ const DashboardPage = ({ onNavigate, onLogout, user }) => {
     }
 
     const handleViewTrip = (tripId) => {
-        console.log('View trip:', tripId)
+        onNavigate(`/trip/${tripId}`)
     }
 
     return (

@@ -146,18 +146,11 @@ const MyTripsPage = ({ onNavigate, onLogout, user }) => {
     }
 
     const handleEditTrip = (id) => {
-        console.log('Editar viaje:', id)
-        // TODO: Navegar a editar viaje
+        onNavigate(`/trip/${id}`)
     }
 
     const handleViewTrip = (id) => {
-        console.log('Ver viaje:', id)
-        // TODO: Navegar a detalles del viaje
-    }
-
-    const handleDeleteTrip = (id) => {
-        console.log('Eliminar viaje:', id)
-        // TODO: Implementar eliminación
+        onNavigate(`/trip/${id}`)
     }
 
     const TripCard = ({ viaje }) => (
@@ -200,50 +193,6 @@ const MyTripsPage = ({ onNavigate, onLogout, user }) => {
                             >
                                 {viaje.esta_activo ? "Activo" : "Completado"}
                             </Badge>
-
-                            <Menu>
-                                <MenuButton
-                                    as={IconButton}
-                                    icon={<FiMoreVertical />}
-                                    variant="ghost"
-                                    size="sm"
-                                    color="gray.600"
-                                    _hover={{ bg: "gray.100", color: "gray.800" }}
-                                />
-                                <MenuList bg="white" border="1px" borderColor="gray.200">
-                                    <MenuItem
-                                        icon={<FiEye />}
-                                        onClick={() => handleViewTrip(viaje.id)}
-                                        color="gray.700"
-                                        _hover={{ bg: "gray.50" }}
-                                    >
-                                        Ver detalles
-                                    </MenuItem>
-                                    <MenuItem
-                                        icon={<FiEdit />}
-                                        onClick={() => handleEditTrip(viaje.id)}
-                                        color="gray.700"
-                                        _hover={{ bg: "gray.50" }}
-                                    >
-                                        Editar
-                                    </MenuItem>
-                                    <MenuItem
-                                        icon={<FiCopy />}
-                                        color="gray.700"
-                                        _hover={{ bg: "gray.50" }}
-                                    >
-                                        Duplicar
-                                    </MenuItem>
-                                    <MenuItem
-                                        icon={<FiTrash2 />}
-                                        onClick={() => handleDeleteTrip(viaje.id)}
-                                        color="red.500"
-                                        _hover={{ bg: "red.50" }}
-                                    >
-                                        Eliminar
-                                    </MenuItem>
-                                </MenuList>
-                            </Menu>
                         </HStack>
                     </HStack>
 
@@ -312,25 +261,30 @@ const MyTripsPage = ({ onNavigate, onLogout, user }) => {
                         </VStack>
                     </HStack>
 
-                    {/* Participantes */}
-                    {viaje.es_viaje_grupal && viaje.participantes.length > 0 && (
-                        <Box>
-                            <Text fontSize="sm" color="gray.600" mb={2} fontWeight="500">
-                                Participantes:
-                            </Text>
-                            <AvatarGroup size="sm" max={3}>
-                                <Avatar name={user?.name || "Tú"} bg="sage.400" color="white" />
-                                {viaje.participantes.map((participante, idx) => (
-                                    <Avatar
-                                        key={idx}
-                                        name={participante}
-                                        bg="blue.400"
-                                        color="white"
-                                    />
-                                ))}
-                            </AvatarGroup>
-                        </Box>
-                    )}
+                    {/* Participantes - SIEMPRE RENDERIZADO CON ALTURA FIJA */}
+                    <Box minH="60px"> {/* Altura mínima fija para mantener consistencia */}
+                        {viaje.es_viaje_grupal && viaje.participantes.length > 0 ? (
+                            <>
+                                <Text fontSize="sm" color="gray.600" mb={2} fontWeight="500">
+                                    Participantes:
+                                </Text>
+                                <AvatarGroup size="sm" max={3}>
+                                    <Avatar name={user?.name || "Tú"} bg="sage.400" color="white" />
+                                    {viaje.participantes.map((participante, idx) => (
+                                        <Avatar
+                                            key={idx}
+                                            name={participante}
+                                            bg="blue.400"
+                                            color="white"
+                                        />
+                                    ))}
+                                </AvatarGroup>
+                            </>
+                        ) : (
+                            // Espacio vacío para mantener la altura consistente
+                            <Box />
+                        )}
+                    </Box>
 
                     {/* Acciones */}
                     <HStack spacing={2}>

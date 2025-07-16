@@ -1,4 +1,3 @@
-// src/pages/ProfilePage.jsx
 import { Container, VStack } from '@chakra-ui/react'
 import { useState } from 'react'
 import ProfileHeader from '../components/profile/ProfileHeader'
@@ -60,7 +59,7 @@ const ProfilePage = ({ onNavigate, onLogout, user }) => {
         }
     })
 
-    // Viajes recientes
+    // Viajes recientes (datos de ejemplo)
     const [recentTrips] = useState([
         {
             id: 1,
@@ -83,69 +82,26 @@ const ProfilePage = ({ onNavigate, onLogout, user }) => {
             status: "upcoming",
             photos: 0,
             rating: null
-        },
-        {
-            id: 3,
-            title: "Costa Rica Adventure",
-            destination: "San José, Costa Rica",
-            date: "2024-03-10",
-            duration: "15 días",
-            image: "🇨🇷",
-            status: "completed",
-            photos: 89,
-            rating: 4
         }
     ])
 
-    // Logros y badges
+    // Logros de ejemplo
     const [achievements] = useState([
         {
             id: 1,
             title: "Primer Viaje",
-            description: "Completaste tu primer viaje",
+            description: "Completa tu primer viaje",
             icon: "🎯",
             earned: true,
-            date: "2023-02-20"
+            earnedDate: "2023-02-15"
         },
         {
             id: 2,
-            title: "Fotógrafo Viajero",
-            description: "Subiste más de 100 fotos",
-            icon: "📸",
-            earned: true,
-            date: "2023-08-15"
-        },
-        {
-            id: 3,
-            title: "Explorador",
-            description: "Visitaste 5 países diferentes",
-            icon: "🌍",
-            earned: true,
-            date: "2024-01-10"
-        },
-        {
-            id: 4,
             title: "Aventurero Social",
-            description: "Organizaste 3 viajes grupales",
+            description: "Realiza 3 viajes en grupo",
             icon: "👥",
             earned: true,
-            date: "2024-05-20"
-        },
-        {
-            id: 5,
-            title: "Continente Completo",
-            description: "Visita todos los países de un continente",
-            icon: "🏆",
-            earned: false,
-            date: null
-        },
-        {
-            id: 6,
-            title: "Nómada Digital",
-            description: "Viaja durante 100 días en un año",
-            icon: "💻",
-            earned: false,
-            date: null
+            earnedDate: "2023-08-22"
         }
     ])
 
@@ -164,8 +120,9 @@ const ProfilePage = ({ onNavigate, onLogout, user }) => {
     }
 
     return (
-        <Container maxW="6xl" py={6} px={{ base: 4, md: 6 }}>
-            <VStack spacing={6} align="stretch">
+        // Padding corregido para móvil
+        <Container maxW="6xl" py={{ base: 4, md: 6 }} px={{ base: 2, md: 6 }}>
+            <VStack spacing={{ base: 4, md: 6 }} align="stretch">
                 <ProfileHeader
                     user={userProfile}
                     stats={userStats}

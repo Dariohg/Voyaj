@@ -1,4 +1,3 @@
-// src/router/utils.js
 import { publicRoutes, protectedRoutes } from './routes'
 
 export const extractTripId = (path) => {

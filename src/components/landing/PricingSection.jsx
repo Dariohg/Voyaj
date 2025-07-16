@@ -67,7 +67,7 @@ const PricingSection = ({ onShowRegister }) => {
                 "Viajes ilimitados",
                 "Planificación avanzada",
                 "Control de gastos completo",
-                "Fotos ilimitadas + geolocalización",
+                "Fotos ilimitadas",
                 "Diario colaborativo",
                 "Viajes en grupo (hasta 10 personas)",
                 "Análisis de patrones de gasto",
@@ -177,7 +177,7 @@ const PricingSection = ({ onShowRegister }) => {
                                         fontWeight="700"
                                         zIndex={1}
                                     >
-                                        ⭐ Más Popular
+                                        Más Popular
                                     </Badge>
                                 )}
 

@@ -1,4 +1,3 @@
-// src/router/Router.jsx
 import { useState, useEffect } from 'react'
 import { extractTripId } from './utils'
 

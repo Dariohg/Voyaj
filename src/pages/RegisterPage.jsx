@@ -26,6 +26,8 @@ import { FiEye, FiEyeOff, FiMail, FiMapPin, FiArrowLeft, FiUser, FiCheck } from 
 import { FaGoogle, FaFacebook } from 'react-icons/fa'
 import React, { useState, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
+import { authService } from '../services/api/authService'
+import { validateAuthResponse } from '../utils/validators/responseValidators'
 
 const RegisterPage = ({ onNavigate, onLogin }) => {
     const [showPassword, setShowPassword] = useState(false)
@@ -45,7 +47,6 @@ const RegisterPage = ({ onNavigate, onLogin }) => {
 
     const password = watch('password')
 
-    // Calculate password strength
     useEffect(() => {
         if (!password) {
             setPasswordStrength(0)
@@ -78,24 +79,36 @@ const RegisterPage = ({ onNavigate, onLogin }) => {
         setIsLoading(true)
 
         try {
-            await new Promise(resolve => setTimeout(resolve, 2000))
+            const userData = {
+                email: data.email,
+                password: data.password,
+                name: data.name
+            }
+
+            const response = await authService.register(userData)
+            const validation = validateAuthResponse(response)
+            
+            if (!validation.isValid) {
+                throw new Error(validation.error)
+            }
 
             toast({
                 title: "¡Cuenta creada exitosamente!",
-                description: "Bienvenido a Voyaj. Tu aventura comienza ahora.",
+                description: "Verifica tu email para completar el registro",
                 status: "success",
                 duration: 4000,
                 isClosable: true,
             })
 
-            console.log('Registration successful:', data)
+            onLogin(response.user)
 
         } catch (error) {
+            console.error('[REGISTER_ERROR]', error)
             toast({
                 title: "Error al crear cuenta",
-                description: "Ocurrió un error. Por favor intenta nuevamente.",
+                description: error.message || "Ocurrió un error inesperado",
                 status: "error",
-                duration: 3000,
+                duration: 4000,
                 isClosable: true,
             })
         } finally {
@@ -105,8 +118,8 @@ const RegisterPage = ({ onNavigate, onLogin }) => {
 
     const handleSocialLogin = (provider) => {
         toast({
-            title: `Registrándose con ${provider}`,
-            description: "Redirigiendo...",
+            title: `Conectando con ${provider}`,
+            description: "Esta función estará disponible pronto",
             status: "info",
             duration: 2000,
             isClosable: true,
@@ -123,7 +136,6 @@ const RegisterPage = ({ onNavigate, onLogin }) => {
 
     return (
         <Box minH="100vh" bg="white" position="relative">
-            {/* Subtle background pattern */}
             <Box
                 position="absolute"
                 inset={0}
@@ -134,91 +146,43 @@ const RegisterPage = ({ onNavigate, onLogin }) => {
 
             <Container maxW="md" py={8} position="relative" zIndex={1}>
                 <VStack spacing={8} align="stretch">
-                    {/* Header with back button and logo */}
                     <HStack justify="space-between" align="center">
                         <IconButton
                             icon={<FiArrowLeft />}
                             variant="ghost"
-                            color="gray.400"
-                            size="sm"
+                            size="lg"
                             onClick={handleBackToHome}
-                            aria-label="Volver"
-                            _hover={{ color: "gray.600" }}
+                            color="gray.600"
+                            _hover={{ bg: "gray.100" }}
                         />
-                        <HStack spacing={2}>
-                            <Icon as={FiMapPin} boxSize={6} color="sage.400" />
-                            <Heading size="md" color="sage.400" fontWeight="600">
+                        <Box textAlign="center">
+                            <Icon as={FiMapPin} boxSize={8} color="sage.500" mb={2} />
+                            <Heading size="lg" color="gray.800" fontWeight="700">
                                 Voyaj
                             </Heading>
-                        </HStack>
+                        </Box>
                         <Box w="40px" />
                     </HStack>
 
-                    {/* Main content */}
-                    <VStack spacing={8} pt={4}>
-                        {/* Title section */}
-                        <VStack spacing={3} textAlign="center">
-                            <Heading
-                                size="xl"
-                                color="gray.800"
-                                fontWeight="600"
-                                letterSpacing="tight"
-                            >
-                                Crear cuenta
+                    <VStack spacing={6} align="stretch">
+                        <VStack spacing={2} textAlign="center">
+                            <Heading size="xl" color="gray.800" fontWeight="700">
+                                Únete a la aventura
                             </Heading>
-                            <Text color="gray.500" fontSize="md">
-                                Únete a miles de viajeros que confían en Voyaj
+                            <Text color="gray.600" fontSize="lg">
+                                Crea tu cuenta y empieza a planificar viajes increíbles
                             </Text>
                         </VStack>
-
-                        {/* Social buttons */}
-                        <VStack spacing={3} w="full">
-                            <Button
-                                w="full"
-                                h="48px"
-                                variant="outline"
-                                borderColor="gray.200"
-                                leftIcon={<FaGoogle color="#DB4437" />}
-                                onClick={() => handleSocialLogin('Google')}
-                                _hover={{
-                                    borderColor: "gray.300",
-                                    bg: "gray.50",
-                                    transform: "translateY(-1px)",
-                                    shadow: "sm"
-                                }}
-                                fontWeight="500"
-                                color="gray.700"
-                                transition="all 0.2s"
-                            >
-                                Continuar con Google
-                            </Button>
-                        </VStack>
-
-                        {/* Divider */}
-                        <HStack w="full" align="center">
-                            <Divider borderColor="gray.200" />
-                            <Text fontSize="sm" color="gray.400" px={3} whiteSpace="nowrap">
-                                o con email
-                            </Text>
-                            <Divider borderColor="gray.200" />
-                        </HStack>
-
-                        {/* Form */}
-                        <Box as="form" onSubmit={handleSubmit(onSubmit)} w="full">
-                            <VStack spacing={6}>
-                                {/* Name fields */}
-                                <HStack spacing={4} w="full">
-                                    <FormControl isInvalid={errors.firstName}>
-                                        <FormLabel
-                                            color="gray.700"
-                                            fontWeight="500"
-                                            fontSize="sm"
-                                            mb={2}
-                                        >
-                                            Nombre
-                                        </FormLabel>
+                        <Box as="form" onSubmit={handleSubmit(onSubmit)}>
+                            <VStack spacing={5}>
+                                <FormControl isInvalid={errors.name}>
+                                    <FormLabel color="gray.700" fontWeight="500">
+                                        Nombre completo
+                                    </FormLabel>
+                                    <InputGroup>
                                         <Input
-                                            placeholder="Juan"
+                                            type="text"
+                                            placeholder="Ej: Juan Pérez"
                                             h="48px"
                                             bg="white"
                                             border="1px"
@@ -229,66 +193,27 @@ const RegisterPage = ({ onNavigate, onLogin }) => {
                                                 borderColor: "sage.400",
                                                 boxShadow: "0 0 0 3px rgba(156, 175, 136, 0.1)"
                                             }}
-                                            {...register('firstName', {
-                                                required: 'Nombre requerido',
+                                            {...register('name', {
+                                                required: 'El nombre es obligatorio',
                                                 minLength: {
                                                     value: 2,
-                                                    message: 'Mínimo 2 caracteres'
+                                                    message: 'El nombre debe tener al menos 2 caracteres'
                                                 }
                                             })}
                                         />
-                                        {errors.firstName && (
-                                            <Text color="red.400" fontSize="xs" mt={1}>
-                                                {errors.firstName.message}
-                                            </Text>
-                                        )}
-                                    </FormControl>
+                                        <InputRightElement h="48px">
+                                            <Icon as={FiUser} color="gray.400" />
+                                        </InputRightElement>
+                                    </InputGroup>
+                                    {errors.name && (
+                                        <Text color="red.400" fontSize="xs" mt={1}>
+                                            {errors.name.message}
+                                        </Text>
+                                    )}
+                                </FormControl>
 
-                                    <FormControl isInvalid={errors.lastName}>
-                                        <FormLabel
-                                            color="gray.700"
-                                            fontWeight="500"
-                                            fontSize="sm"
-                                            mb={2}
-                                        >
-                                            Apellido
-                                        </FormLabel>
-                                        <Input
-                                            placeholder="Pérez"
-                                            h="48px"
-                                            bg="white"
-                                            border="1px"
-                                            borderColor="gray.200"
-                                            borderRadius="12px"
-                                            _hover={{ borderColor: "gray.300" }}
-                                            _focus={{
-                                                borderColor: "sage.400",
-                                                boxShadow: "0 0 0 3px rgba(156, 175, 136, 0.1)"
-                                            }}
-                                            {...register('lastName', {
-                                                required: 'Apellido requerido',
-                                                minLength: {
-                                                    value: 2,
-                                                    message: 'Mínimo 2 caracteres'
-                                                }
-                                            })}
-                                        />
-                                        {errors.lastName && (
-                                            <Text color="red.400" fontSize="xs" mt={1}>
-                                                {errors.lastName.message}
-                                            </Text>
-                                        )}
-                                    </FormControl>
-                                </HStack>
-
-                                {/* Email */}
                                 <FormControl isInvalid={errors.email}>
-                                    <FormLabel
-                                        color="gray.700"
-                                        fontWeight="500"
-                                        fontSize="sm"
-                                        mb={2}
-                                    >
+                                    <FormLabel color="gray.700" fontWeight="500">
                                         Email
                                     </FormLabel>
                                     <InputGroup>
@@ -306,7 +231,7 @@ const RegisterPage = ({ onNavigate, onLogin }) => {
                                                 boxShadow: "0 0 0 3px rgba(156, 175, 136, 0.1)"
                                             }}
                                             {...register('email', {
-                                                required: 'Email requerido',
+                                                required: 'El email es obligatorio',
                                                 pattern: {
                                                     value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
                                                     message: 'Email inválido'
@@ -324,14 +249,8 @@ const RegisterPage = ({ onNavigate, onLogin }) => {
                                     )}
                                 </FormControl>
 
-                                {/* Password */}
                                 <FormControl isInvalid={errors.password}>
-                                    <FormLabel
-                                        color="gray.700"
-                                        fontWeight="500"
-                                        fontSize="sm"
-                                        mb={2}
-                                    >
+                                    <FormLabel color="gray.700" fontWeight="500">
                                         Contraseña
                                     </FormLabel>
                                     <InputGroup>
@@ -349,10 +268,10 @@ const RegisterPage = ({ onNavigate, onLogin }) => {
                                                 boxShadow: "0 0 0 3px rgba(156, 175, 136, 0.1)"
                                             }}
                                             {...register('password', {
-                                                required: 'Contraseña requerida',
+                                                required: 'La contraseña es obligatoria',
                                                 minLength: {
                                                     value: 6,
-                                                    message: 'Mínimo 6 caracteres'
+                                                    message: 'La contraseña debe tener al menos 6 caracteres'
                                                 }
                                             })}
                                         />
@@ -367,32 +286,28 @@ const RegisterPage = ({ onNavigate, onLogin }) => {
                                             />
                                         </InputRightElement>
                                     </InputGroup>
-
                                     {password && (
-                                        <VStack spacing={2} mt={2} align="start">
-                                            <HStack justify="space-between" w="full">
-                                                <Text fontSize="xs" color="gray.500">
-                                                    Fortaleza:
-                                                </Text>
-                                                <Badge
-                                                    colorScheme={getPasswordStrengthColor()}
-                                                    size="sm"
-                                                    variant="subtle"
-                                                    fontSize="xs"
-                                                >
-                                                    {getPasswordStrengthLabel()}
-                                                </Badge>
-                                            </HStack>
+                                        <VStack spacing={1} mt={2} align="stretch">
                                             <Progress
                                                 value={passwordStrength}
                                                 size="sm"
                                                 colorScheme={getPasswordStrengthColor()}
-                                                w="full"
                                                 borderRadius="full"
                                             />
+                                            <HStack justify="space-between">
+                                                <Text fontSize="xs" color="gray.500">
+                                                    Fortaleza:
+                                                </Text>
+                                                <Badge
+                                                    size="sm"
+                                                    colorScheme={getPasswordStrengthColor()}
+                                                    variant="subtle"
+                                                >
+                                                    {getPasswordStrengthLabel()}
+                                                </Badge>
+                                            </HStack>
                                         </VStack>
                                     )}
-
                                     {errors.password && (
                                         <Text color="red.400" fontSize="xs" mt={1}>
                                             {errors.password.message}
@@ -400,14 +315,8 @@ const RegisterPage = ({ onNavigate, onLogin }) => {
                                     )}
                                 </FormControl>
 
-                                {/* Confirm Password */}
                                 <FormControl isInvalid={errors.confirmPassword}>
-                                    <FormLabel
-                                        color="gray.700"
-                                        fontWeight="500"
-                                        fontSize="sm"
-                                        mb={2}
-                                    >
+                                    <FormLabel color="gray.700" fontWeight="500">
                                         Confirmar contraseña
                                     </FormLabel>
                                     <InputGroup>
@@ -448,7 +357,6 @@ const RegisterPage = ({ onNavigate, onLogin }) => {
                                     )}
                                 </FormControl>
 
-                                {/* Terms checkbox */}
                                 <FormControl isInvalid={errors.acceptTerms}>
                                     <Checkbox
                                         colorScheme="green"
@@ -470,7 +378,6 @@ const RegisterPage = ({ onNavigate, onLogin }) => {
                                     )}
                                 </FormControl>
 
-                                {/* Submit button */}
                                 <Button
                                     type="submit"
                                     w="full"
@@ -496,7 +403,6 @@ const RegisterPage = ({ onNavigate, onLogin }) => {
                             </VStack>
                         </Box>
 
-                        {/* Login link */}
                         <Center>
                             <HStack spacing={2}>
                                 <Text color="gray.500" fontSize="sm">

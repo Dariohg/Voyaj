@@ -1,6 +1,7 @@
 import LandingPage from '../pages/LandingPage'
 import LoginPage from '../pages/LoginPage'
 import RegisterPage from '../pages/RegisterPage'
+import ForgotPasswordPage from '../pages/ForgotPasswordPage'
 import DashboardPage from '../pages/DashboardPage'
 import CreateTripPage from '../pages/CreateTripPage'
 import MyTripsPage from '../pages/MyTripsPage'
@@ -21,7 +22,6 @@ export const RouteRenderer = ({
                                   onLogin,
                                   onLogout
                               }) => {
-    // Función para verificar autenticación
     const requireAuth = (component) => {
         if (!user) {
             return <LoginPage onNavigate={navigate} onLogin={onLogin} />
@@ -29,7 +29,6 @@ export const RouteRenderer = ({
         return component
     }
 
-    // Función para renderizar páginas autenticadas
     const renderAuthenticatedPage = () => {
         switch (currentRoute) {
             case routes.DASHBOARD:
@@ -109,7 +108,6 @@ export const RouteRenderer = ({
         }
     }
 
-    // Renderizar páginas públicas
     if (isPublicRoute(currentRoute)) {
         switch (currentRoute) {
             case routes.HOME:
@@ -121,12 +119,14 @@ export const RouteRenderer = ({
             case routes.REGISTER:
                 return <RegisterPage onNavigate={navigate} onLogin={onLogin} />
 
+            case routes.FORGOT_PASSWORD:
+                return <ForgotPasswordPage onNavigate={navigate} />
+
             default:
                 return <LandingPage onNavigate={navigate} />
         }
     }
 
-    // Renderizar páginas autenticadas con layout
     const pageContent = renderAuthenticatedPage()
 
     if (pageContent && user) {
@@ -142,6 +142,5 @@ export const RouteRenderer = ({
         )
     }
 
-    // Si no hay autenticación, redirigir a login
     return <LoginPage onNavigate={navigate} onLogin={onLogin} />
 }

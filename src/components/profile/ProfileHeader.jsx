@@ -1,4 +1,3 @@
-// src/components/profile/ProfileHeader.jsx - Versión responsive corregida
 import {
     VStack,
     HStack,
@@ -21,12 +20,9 @@ import {
     FiEdit,
     FiLock,
     FiMail,
-    FiPhone,
     FiMapPin,
-    FiCalendar,
     FiUsers,
-    FiFlag,
-    FiCamera
+    FiCalendar
 } from 'react-icons/fi'
 
 const ProfileHeader = ({ user, stats, onEditProfile, onChangePassword }) => {
@@ -39,22 +35,8 @@ const ProfileHeader = ({ user, stats, onEditProfile, onChangePassword }) => {
         })
     }
 
-    const calculateAge = (birthDate) => {
-        const today = new Date()
-        const birth = new Date(birthDate)
-        let age = today.getFullYear() - birth.getFullYear()
-        const monthDiff = today.getMonth() - birth.getMonth()
-
-        if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
-            age--
-        }
-
-        return age
-    }
-
     return (
         <VStack spacing={{ base: 4, md: 6 }} align="stretch">
-            {/* Información principal del perfil */}
             <Card bg="white" border="1px" borderColor="gray.200">
                 <CardBody p={{ base: 4, md: 6 }}>
                     <Flex
@@ -62,7 +44,6 @@ const ProfileHeader = ({ user, stats, onEditProfile, onChangePassword }) => {
                         gap={{ base: 4, md: 6 }}
                         align={{ base: "center", md: "start" }}
                     >
-                        {/* Avatar y info básica */}
                         <VStack spacing={4} align="center" minW={{ md: "280px" }}>
                             <Avatar
                                 size={{ base: "xl", md: "2xl" }}
@@ -94,18 +75,8 @@ const ProfileHeader = ({ user, stats, onEditProfile, onChangePassword }) => {
                             </VStack>
                         </VStack>
 
-                        {/* Información detallada */}
                         <VStack spacing={4} align="start" flex={1} w="full">
                             <VStack spacing={3} align="start" w="full">
-                                <Text
-                                    color="gray.700"
-                                    fontSize={{ base: "sm", md: "md" }}
-                                    lineHeight="1.6"
-                                    textAlign={{ base: "center", md: "left" }}
-                                >
-                                    {user.bio}
-                                </Text>
-
                                 <SimpleGrid
                                     columns={{ base: 1, sm: 2 }}
                                     spacing={3}
@@ -122,28 +93,6 @@ const ProfileHeader = ({ user, stats, onEditProfile, onChangePassword }) => {
                                         </Text>
                                     </HStack>
                                     <HStack spacing={2}>
-                                        <Icon as={FiPhone} boxSize={4} color="gray.500" />
-                                        <Text fontSize={{ base: "xs", md: "sm" }} color="gray.600">
-                                            {user.phone}
-                                        </Text>
-                                    </HStack>
-                                    <HStack spacing={2}>
-                                        <Icon as={FiMapPin} boxSize={4} color="gray.500" />
-                                        <Text
-                                            fontSize={{ base: "xs", md: "sm" }}
-                                            color="gray.600"
-                                            isTruncated
-                                        >
-                                            {user.city}
-                                        </Text>
-                                    </HStack>
-                                    <HStack spacing={2}>
-                                        <Icon as={FiCalendar} boxSize={4} color="gray.500" />
-                                        <Text fontSize={{ base: "xs", md: "sm" }} color="gray.600">
-                                            {calculateAge(user.birthDate)} años
-                                        </Text>
-                                    </HStack>
-                                    <HStack spacing={2}>
                                         <Icon as={FiUsers} boxSize={4} color="gray.500" />
                                         <Text fontSize={{ base: "xs", md: "sm" }} color="gray.600">
                                             Miembro desde {formatJoinDate(user.joinDate)}
@@ -152,7 +101,6 @@ const ProfileHeader = ({ user, stats, onEditProfile, onChangePassword }) => {
                                 </SimpleGrid>
                             </VStack>
 
-                            {/* Botones de acción */}
                             <HStack
                                 spacing={3}
                                 w="full"
@@ -172,18 +120,9 @@ const ProfileHeader = ({ user, stats, onEditProfile, onChangePassword }) => {
                                 <Button
                                     leftIcon={<Icon as={FiLock} />}
                                     variant="outline"
-                                    borderColor="gray.300"
-                                    color="gray.700"
-                                    bg="white"
                                     onClick={onChangePassword}
                                     size={{ base: "sm", md: "md" }}
-                                    minW={{ base: "160px", md: "auto" }}
-                                    _hover={{
-                                        borderColor: "sage.400",
-                                        color: "sage.600",
-                                        bg: "sage.50"
-                                    }}
-                                    whiteSpace="nowrap"
+                                    minW={{ base: "120px", md: "auto" }}
                                 >
                                     Cambiar Contraseña
                                 </Button>
@@ -193,17 +132,15 @@ const ProfileHeader = ({ user, stats, onEditProfile, onChangePassword }) => {
                 </CardBody>
             </Card>
 
-            {/* Estadísticas - Grid responsive */}
             <SimpleGrid
-                columns={{ base: 2, md: 4 }}
+                columns={{ base: 2, sm: 4 }}
                 spacing={{ base: 3, md: 4 }}
-                w="full"
             >
                 <Card bg="white" border="1px" borderColor="gray.200" _hover={{ transform: "translateY(-2px)", shadow: "lg" }} transition="all 0.2s">
                     <CardBody p={{ base: 4, md: 6 }}>
                         <VStack spacing={{ base: 2, md: 3 }} align="center">
                             <Box p={{ base: 2, md: 3 }} bg="blue.100" borderRadius="xl">
-                                <Icon as={FiFlag} boxSize={{ base: 5, md: 6 }} color="blue.500" />
+                                <Icon as={FiMapPin} boxSize={{ base: 5, md: 6 }} color="blue.500" />
                             </Box>
                             <Stat textAlign="center">
                                 <StatNumber
@@ -230,7 +167,7 @@ const ProfileHeader = ({ user, stats, onEditProfile, onChangePassword }) => {
                     <CardBody p={{ base: 4, md: 6 }}>
                         <VStack spacing={{ base: 2, md: 3 }} align="center">
                             <Box p={{ base: 2, md: 3 }} bg="green.100" borderRadius="xl">
-                                <Icon as={FiMapPin} boxSize={{ base: 5, md: 6 }} color="green.500" />
+                                <Icon as={FiCalendar} boxSize={{ base: 5, md: 6 }} color="green.500" />
                             </Box>
                             <Stat textAlign="center">
                                 <StatNumber
@@ -238,42 +175,15 @@ const ProfileHeader = ({ user, stats, onEditProfile, onChangePassword }) => {
                                     fontSize={{ base: "xl", md: "2xl" }}
                                     fontWeight="700"
                                 >
-                                    {stats.totalCountries}
+                                    {stats.completedTrips}
                                 </StatNumber>
                                 <StatLabel
                                     color="gray.600"
                                     fontSize={{ base: "xs", md: "sm" }}
                                     fontWeight="500"
                                 >
-                                    <Box display={{ base: "block", sm: "none" }}>Países</Box>
-                                    <Box display={{ base: "none", sm: "block" }}>Países Visitados</Box>
-                                </StatLabel>
-                            </Stat>
-                        </VStack>
-                    </CardBody>
-                </Card>
-
-                <Card bg="white" border="1px" borderColor="gray.200" _hover={{ transform: "translateY(-2px)", shadow: "lg" }} transition="all 0.2s">
-                    <CardBody p={{ base: 4, md: 6 }}>
-                        <VStack spacing={{ base: 2, md: 3 }} align="center">
-                            <Box p={{ base: 2, md: 3 }} bg="purple.100" borderRadius="xl">
-                                <Icon as={FiCamera} boxSize={{ base: 5, md: 6 }} color="purple.500" />
-                            </Box>
-                            <Stat textAlign="center">
-                                <StatNumber
-                                    color="purple.500"
-                                    fontSize={{ base: "xl", md: "2xl" }}
-                                    fontWeight="700"
-                                >
-                                    {stats.totalPhotos}
-                                </StatNumber>
-                                <StatLabel
-                                    color="gray.600"
-                                    fontSize={{ base: "xs", md: "sm" }}
-                                    fontWeight="500"
-                                >
-                                    <Box display={{ base: "block", sm: "none" }}>Fotos</Box>
-                                    <Box display={{ base: "none", sm: "block" }}>Fotos Subidas</Box>
+                                    <Box display={{ base: "block", sm: "none" }}>Completados</Box>
+                                    <Box display={{ base: "none", sm: "block" }}>Completados</Box>
                                 </StatLabel>
                             </Stat>
                         </VStack>
@@ -292,15 +202,42 @@ const ProfileHeader = ({ user, stats, onEditProfile, onChangePassword }) => {
                                     fontSize={{ base: "xl", md: "2xl" }}
                                     fontWeight="700"
                                 >
-                                    {(stats.totalDistance / 1000).toFixed(0)}K
+                                    {stats.activeTrips}
                                 </StatNumber>
                                 <StatLabel
                                     color="gray.600"
                                     fontSize={{ base: "xs", md: "sm" }}
                                     fontWeight="500"
                                 >
-                                    <Box display={{ base: "block", sm: "none" }}>KM</Box>
-                                    <Box display={{ base: "none", sm: "block" }}>KM Recorridos</Box>
+                                    <Box display={{ base: "block", sm: "none" }}>Activos</Box>
+                                    <Box display={{ base: "none", sm: "block" }}>Activos</Box>
+                                </StatLabel>
+                            </Stat>
+                        </VStack>
+                    </CardBody>
+                </Card>
+
+                <Card bg="white" border="1px" borderColor="gray.200" _hover={{ transform: "translateY(-2px)", shadow: "lg" }} transition="all 0.2s">
+                    <CardBody p={{ base: 4, md: 6 }}>
+                        <VStack spacing={{ base: 2, md: 3 }} align="center">
+                            <Box p={{ base: 2, md: 3 }} bg="purple.100" borderRadius="xl">
+                                <Icon as={FiCalendar} boxSize={{ base: 5, md: 6 }} color="purple.500" />
+                            </Box>
+                            <Stat textAlign="center">
+                                <StatNumber
+                                    color="purple.500"
+                                    fontSize={{ base: "xl", md: "2xl" }}
+                                    fontWeight="700"
+                                >
+                                    {stats.upcomingTrips}
+                                </StatNumber>
+                                <StatLabel
+                                    color="gray.600"
+                                    fontSize={{ base: "xs", md: "sm" }}
+                                    fontWeight="500"
+                                >
+                                    <Box display={{ base: "block", sm: "none" }}>Próximos</Box>
+                                    <Box display={{ base: "none", sm: "block" }}>Próximos</Box>
                                 </StatLabel>
                             </Stat>
                         </VStack>

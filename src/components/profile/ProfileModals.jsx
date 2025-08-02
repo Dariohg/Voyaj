@@ -8,25 +8,24 @@ import {
     ModalCloseButton,
     Button,
     VStack,
-    HStack,
-    SimpleGrid,
     FormControl,
     FormLabel,
     Input,
-    Textarea,
-    Select,
     Avatar,
-    Text,
     useToast,
     InputGroup,
     InputRightElement,
-    Icon
+    Icon,
+    Box,
+    Text
 } from '@chakra-ui/react'
 import {
     FiEye,
-    FiEyeOff
+    FiEyeOff,
+    FiUpload
 } from 'react-icons/fi'
-import { useState } from 'react'
+import { useState, useRef } from 'react'
+import { authService } from '../../services/api/authService'
 
 const ProfileModals = ({
                            user,
@@ -38,17 +37,11 @@ const ProfileModals = ({
                            onChangePassword
                        }) => {
     const toast = useToast()
+    const fileInputRef = useRef()
 
-    // Estado para el modal de editar perfil
+    // Estado para el modal de editar perfil (solo nombre)
     const [editFormData, setEditFormData] = useState({
-        firstName: user.firstName || '',
-        lastName: user.lastName || '',
-        email: user.email || '',
-        phone: user.phone || '',
-        country: user.country || '',
-        city: user.city || '',
-        birthDate: user.birthDate || '',
-        bio: user.bio || ''
+        name: user.name || ''
     })
 
     // Estado para el modal de cambiar contraseña
@@ -64,16 +57,11 @@ const ProfileModals = ({
         confirm: false
     })
 
+    const [isUploadingPhoto, setIsUploadingPhoto] = useState(false)
+
     const resetEditForm = () => {
         setEditFormData({
-            firstName: user.firstName || '',
-            lastName: user.lastName || '',
-            email: user.email || '',
-            phone: user.phone || '',
-            country: user.country || '',
-            city: user.city || '',
-            birthDate: user.birthDate || '',
-            bio: user.bio || ''
+            name: user.name || ''
         })
     }
 
@@ -91,11 +79,10 @@ const ProfileModals = ({
     }
 
     const handleEditSave = () => {
-        // Validaciones básicas
-        if (!editFormData.firstName.trim() || !editFormData.lastName.trim()) {
+        if (!editFormData.name.trim()) {
             toast({
                 title: "Error",
-                description: "El nombre y apellido son obligatorios",
+                description: "El nombre es obligatorio",
                 status: "error",
                 duration: 3000,
                 isClosable: true,
@@ -103,21 +90,7 @@ const ProfileModals = ({
             return
         }
 
-        if (!editFormData.email.trim() || !editFormData.email.includes('@')) {
-            toast({
-                title: "Error",
-                description: "Por favor ingresa un email válido",
-                status: "error",
-                duration: 3000,
-                isClosable: true,
-            })
-            return
-        }
-
-        onSaveProfile({
-            ...editFormData,
-            name: `${editFormData.firstName} ${editFormData.lastName}`
-        })
+        onSaveProfile(editFormData)
 
         toast({
             title: "Perfil actualizado",
@@ -129,7 +102,6 @@ const ProfileModals = ({
     }
 
     const handlePasswordSave = () => {
-        // Validaciones
         if (!passwordData.currentPassword.trim()) {
             toast({
                 title: "Error",
@@ -141,10 +113,10 @@ const ProfileModals = ({
             return
         }
 
-        if (passwordData.newPassword.length < 8) {
+        if (passwordData.newPassword.length < 6) {
             toast({
                 title: "Error",
-                description: "La nueva contraseña debe tener al menos 8 caracteres",
+                description: "La nueva contraseña debe tener al menos 6 caracteres",
                 status: "error",
                 duration: 3000,
                 isClosable: true,
@@ -175,6 +147,68 @@ const ProfileModals = ({
         })
     }
 
+    const handlePhotoUpload = async (event) => {
+        const file = event.target.files[0]
+        if (!file) return
+
+        // Validar tamaño (5MB max)
+        if (file.size > 5 * 1024 * 1024) {
+            toast({
+                title: "Error",
+                description: "La imagen debe ser menor a 5MB",
+                status: "error",
+                duration: 3000,
+                isClosable: true,
+            })
+            return
+        }
+
+        // Validar tipo
+        if (!file.type.startsWith('image/')) {
+            toast({
+                title: "Error",
+                description: "Solo se permiten archivos de imagen",
+                status: "error",
+                duration: 3000,
+                isClosable: true,
+            })
+            return
+        }
+
+        try {
+            setIsUploadingPhoto(true)
+            
+            // Usar el endpoint real de upload
+            const response = await authService.uploadProfilePhoto(file)
+            
+            // Actualizar el avatar del usuario
+            onSaveProfile({ 
+                ...user, 
+                avatar: response.profile_photo_url 
+            })
+
+            toast({
+                title: "Foto actualizada",
+                description: "Tu foto de perfil ha sido cambiada",
+                status: "success",
+                duration: 3000,
+                isClosable: true,
+            })
+
+        } catch (error) {
+            console.error('[PHOTO_UPLOAD_ERROR]', error)
+            toast({
+                title: "Error",
+                description: "No se pudo subir la imagen. Intenta de nuevo.",
+                status: "error",
+                duration: 3000,
+                isClosable: true,
+            })
+        } finally {
+            setIsUploadingPhoto(false)
+        }
+    }
+
     return (
         <>
             {/* Modal para editar perfil */}
@@ -184,7 +218,7 @@ const ProfileModals = ({
                     onCloseEditModal()
                     resetEditForm()
                 }}
-                size="lg"
+                size="md"
             >
                 <ModalOverlay bg="blackAlpha.300" backdropFilter="blur(10px)" />
                 <ModalContent bg="white" color="gray.800" borderRadius="xl" mx={4}>
@@ -200,52 +234,45 @@ const ProfileModals = ({
                     <ModalCloseButton color="gray.600" />
                     <ModalBody bg="white" py={6}>
                         <VStack spacing={6}>
-                            {/* Avatar */}
+                            {/* Avatar con botón de upload */}
                             <VStack spacing={3}>
                                 <Avatar
                                     size="xl"
-                                    name={`${editFormData.firstName} ${editFormData.lastName}`}
+                                    name={editFormData.name}
                                     src={user.avatar}
                                     bg="sage.400"
                                     color="white"
                                 />
-                                <Button size="sm" variant="outline" colorScheme="sage">
+                                <Button 
+                                    size="sm" 
+                                    variant="outline" 
+                                    colorScheme="sage"
+                                    leftIcon={<Icon as={FiUpload} />}
+                                    onClick={() => fileInputRef.current?.click()}
+                                    isLoading={isUploadingPhoto}
+                                    loadingText="Subiendo..."
+                                >
                                     Cambiar Foto
                                 </Button>
+                                <input
+                                    ref={fileInputRef}
+                                    type="file"
+                                    accept="image/*"
+                                    style={{ display: 'none' }}
+                                    onChange={handlePhotoUpload}
+                                />
+                                <Text fontSize="xs" color="gray.500" textAlign="center">
+                                    Máximo 5MB • JPG, PNG, GIF
+                                </Text>
                             </VStack>
 
-                            <SimpleGrid columns={2} spacing={4} w="full">
-                                <FormControl isRequired>
-                                    <FormLabel color="gray.700" fontWeight="500">Nombre</FormLabel>
-                                    <Input
-                                        value={editFormData.firstName}
-                                        onChange={(e) => setEditFormData({...editFormData, firstName: e.target.value})}
-                                        bg="white"
-                                        color="gray.800"
-                                        borderColor="gray.300"
-                                        _focus={{ borderColor: "sage.400", boxShadow: "0 0 0 1px sage.400" }}
-                                    />
-                                </FormControl>
-
-                                <FormControl isRequired>
-                                    <FormLabel color="gray.700" fontWeight="500">Apellido</FormLabel>
-                                    <Input
-                                        value={editFormData.lastName}
-                                        onChange={(e) => setEditFormData({...editFormData, lastName: e.target.value})}
-                                        bg="white"
-                                        color="gray.800"
-                                        borderColor="gray.300"
-                                        _focus={{ borderColor: "sage.400", boxShadow: "0 0 0 1px sage.400" }}
-                                    />
-                                </FormControl>
-                            </SimpleGrid>
-
+                            {/* Solo campo de nombre */}
                             <FormControl isRequired>
-                                <FormLabel color="gray.700" fontWeight="500">Email</FormLabel>
+                                <FormLabel color="gray.700" fontWeight="500">Nombre completo</FormLabel>
                                 <Input
-                                    type="email"
-                                    value={editFormData.email}
-                                    onChange={(e) => setEditFormData({...editFormData, email: e.target.value})}
+                                    value={editFormData.name}
+                                    onChange={(e) => setEditFormData({...editFormData, name: e.target.value})}
+                                    placeholder="Tu nombre completo"
                                     bg="white"
                                     color="gray.800"
                                     borderColor="gray.300"
@@ -253,78 +280,12 @@ const ProfileModals = ({
                                 />
                             </FormControl>
 
-                            <FormControl>
-                                <FormLabel color="gray.700" fontWeight="500">Teléfono</FormLabel>
-                                <Input
-                                    type="tel"
-                                    value={editFormData.phone}
-                                    onChange={(e) => setEditFormData({...editFormData, phone: e.target.value})}
-                                    bg="white"
-                                    color="gray.800"
-                                    borderColor="gray.300"
-                                    _focus={{ borderColor: "sage.400", boxShadow: "0 0 0 1px sage.400" }}
-                                />
-                            </FormControl>
-
-                            <SimpleGrid columns={2} spacing={4} w="full">
-                                <FormControl>
-                                    <FormLabel color="gray.700" fontWeight="500">País</FormLabel>
-                                    <Select
-                                        value={editFormData.country}
-                                        onChange={(e) => setEditFormData({...editFormData, country: e.target.value})}
-                                        bg="white"
-                                        color="gray.800"
-                                        borderColor="gray.300"
-                                        _focus={{ borderColor: "sage.400", boxShadow: "0 0 0 1px sage.400" }}
-                                    >
-                                        <option value="" style={{ color: 'black' }}>Selecciona país</option>
-                                        <option value="México" style={{ color: 'black' }}>México</option>
-                                        <option value="Estados Unidos" style={{ color: 'black' }}>Estados Unidos</option>
-                                        <option value="España" style={{ color: 'black' }}>España</option>
-                                        <option value="Francia" style={{ color: 'black' }}>Francia</option>
-                                    </Select>
-                                </FormControl>
-
-                                <FormControl>
-                                    <FormLabel color="gray.700" fontWeight="500">Ciudad</FormLabel>
-                                    <Input
-                                        value={editFormData.city}
-                                        onChange={(e) => setEditFormData({...editFormData, city: e.target.value})}
-                                        bg="white"
-                                        color="gray.800"
-                                        borderColor="gray.300"
-                                        _focus={{ borderColor: "sage.400", boxShadow: "0 0 0 1px sage.400" }}
-                                    />
-                                </FormControl>
-                            </SimpleGrid>
-
-                            <FormControl>
-                                <FormLabel color="gray.700" fontWeight="500">Fecha de nacimiento</FormLabel>
-                                <Input
-                                    type="date"
-                                    value={editFormData.birthDate}
-                                    onChange={(e) => setEditFormData({...editFormData, birthDate: e.target.value})}
-                                    bg="white"
-                                    color="gray.800"
-                                    borderColor="gray.300"
-                                    _focus={{ borderColor: "sage.400", boxShadow: "0 0 0 1px sage.400" }}
-                                />
-                            </FormControl>
-
-                            <FormControl>
-                                <FormLabel color="gray.700" fontWeight="500">Biografía</FormLabel>
-                                <Textarea
-                                    value={editFormData.bio}
-                                    onChange={(e) => setEditFormData({...editFormData, bio: e.target.value})}
-                                    placeholder="Cuéntanos un poco sobre ti..."
-                                    rows={4}
-                                    bg="white"
-                                    color="gray.800"
-                                    borderColor="gray.300"
-                                    _placeholder={{ color: "gray.400" }}
-                                    _focus={{ borderColor: "sage.400", boxShadow: "0 0 0 1px sage.400" }}
-                                />
-                            </FormControl>
+                            <Box p={4} bg="gray.50" borderRadius="md">
+                                <Text fontSize="sm" color="gray.600">
+                                    <strong>Nota:</strong> El email no se puede modificar desde aquí. 
+                                    Para cambios de email, contacta al soporte.
+                                </Text>
+                            </Box>
                         </VStack>
                     </ModalBody>
                     <ModalFooter bg="white" borderBottomRadius="xl" borderTop="1px" borderColor="gray.200">
@@ -378,9 +339,10 @@ const ProfileModals = ({
                                 <FormLabel color="gray.700" fontWeight="500">Contraseña actual</FormLabel>
                                 <InputGroup>
                                     <Input
-                                        type={showPasswords.current ? "text" : "password"}
+                                        type={showPasswords.current ? 'text' : 'password'}
                                         value={passwordData.currentPassword}
                                         onChange={(e) => setPasswordData({...passwordData, currentPassword: e.target.value})}
+                                        placeholder="Tu contraseña actual"
                                         bg="white"
                                         color="gray.800"
                                         borderColor="gray.300"
@@ -389,7 +351,6 @@ const ProfileModals = ({
                                     <InputRightElement>
                                         <Button
                                             variant="ghost"
-                                            size="sm"
                                             onClick={() => setShowPasswords({...showPasswords, current: !showPasswords.current})}
                                         >
                                             <Icon as={showPasswords.current ? FiEyeOff : FiEye} />
@@ -402,9 +363,10 @@ const ProfileModals = ({
                                 <FormLabel color="gray.700" fontWeight="500">Nueva contraseña</FormLabel>
                                 <InputGroup>
                                     <Input
-                                        type={showPasswords.new ? "text" : "password"}
+                                        type={showPasswords.new ? 'text' : 'password'}
                                         value={passwordData.newPassword}
                                         onChange={(e) => setPasswordData({...passwordData, newPassword: e.target.value})}
+                                        placeholder="Tu nueva contraseña"
                                         bg="white"
                                         color="gray.800"
                                         borderColor="gray.300"
@@ -413,25 +375,22 @@ const ProfileModals = ({
                                     <InputRightElement>
                                         <Button
                                             variant="ghost"
-                                            size="sm"
                                             onClick={() => setShowPasswords({...showPasswords, new: !showPasswords.new})}
                                         >
                                             <Icon as={showPasswords.new ? FiEyeOff : FiEye} />
                                         </Button>
                                     </InputRightElement>
                                 </InputGroup>
-                                <Text fontSize="xs" color="gray.500" mt={1}>
-                                    Mínimo 8 caracteres
-                                </Text>
                             </FormControl>
 
                             <FormControl isRequired>
                                 <FormLabel color="gray.700" fontWeight="500">Confirmar nueva contraseña</FormLabel>
                                 <InputGroup>
                                     <Input
-                                        type={showPasswords.confirm ? "text" : "password"}
+                                        type={showPasswords.confirm ? 'text' : 'password'}
                                         value={passwordData.confirmPassword}
                                         onChange={(e) => setPasswordData({...passwordData, confirmPassword: e.target.value})}
+                                        placeholder="Confirma tu nueva contraseña"
                                         bg="white"
                                         color="gray.800"
                                         borderColor="gray.300"
@@ -440,7 +399,6 @@ const ProfileModals = ({
                                     <InputRightElement>
                                         <Button
                                             variant="ghost"
-                                            size="sm"
                                             onClick={() => setShowPasswords({...showPasswords, confirm: !showPasswords.confirm})}
                                         >
                                             <Icon as={showPasswords.confirm ? FiEyeOff : FiEye} />

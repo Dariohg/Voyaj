@@ -14,8 +14,7 @@ import {
     MenuItem,
     Divider,
     IconButton,
-    useBreakpointValue,
-    Spinner
+    useBreakpointValue
 } from '@chakra-ui/react'
 import {
     FiMapPin,
@@ -24,36 +23,9 @@ import {
     FiLogOut,
     FiMenu
 } from 'react-icons/fi'
-import { useState, useEffect } from 'react'
-import { subscriptionsService } from '../services/api/subscriptionsService'
 
 const Navbar = ({ user, onNavigate, onLogout, onMenuClick }) => {
-    const [subscription, setSubscription] = useState(null)
-    const [isLoadingSubscription, setIsLoadingSubscription] = useState(true)
     const isMobile = useBreakpointValue({ base: true, lg: false })
-
-    useEffect(() => {
-        const fetchSubscriptionStatus = async () => {
-            if (!user) return
-            
-            try {
-                setIsLoadingSubscription(true)
-                const response = await subscriptionsService.getStatus()
-                setSubscription(response)
-            } catch (error) {
-                console.error('[SUBSCRIPTION_STATUS_ERROR]', error)
-                setSubscription({ 
-                    plan: 'free', 
-                    is_pro: false, 
-                    status: 'active' 
-                })
-            } finally {
-                setIsLoadingSubscription(false)
-            }
-        }
-
-        fetchSubscriptionStatus()
-    }, [user])
 
     const handleProfile = () => {
         onNavigate('/profile')
@@ -63,18 +35,13 @@ const Navbar = ({ user, onNavigate, onLogout, onMenuClick }) => {
         onNavigate('/settings')
     }
 
-    const getPlanDisplayName = () => {
-        if (isLoadingSubscription) return "Cargando..."
-        if (!subscription) return "Viajero Premium"
-        
-        return subscription.is_pro ? "Viajero Premium" : "Viajero FREE"
-    }
-
     return (
         <Box bg="white" borderBottom="1px" borderColor="gray.200" position="sticky" top={0} zIndex={100}>
             <Container maxW="7xl" py={4} px={{ base: 4, md: 8 }}>
                 <Flex justify="space-between" align="center">
+                    {/* Lado izquierdo: Botón menú móvil + Logo */}
                     <HStack spacing={3}>
+                        {/* Botón menú hamburguesa - Solo móvil */}
                         {isMobile && (
                             <IconButton
                                 aria-label="Abrir menú"
@@ -87,6 +54,7 @@ const Navbar = ({ user, onNavigate, onLogout, onMenuClick }) => {
                             />
                         )}
 
+                        {/* Logo */}
                         <HStack spacing={2} cursor="pointer" onClick={() => onNavigate('/dashboard')}>
                             <Icon as={FiMapPin} boxSize={8} color="sage.400" />
                             <Heading size="lg" color="sage.400" fontWeight="600">
@@ -95,6 +63,7 @@ const Navbar = ({ user, onNavigate, onLogout, onMenuClick }) => {
                         </HStack>
                     </HStack>
 
+                    {/* User Menu */}
                     <Menu>
                         <MenuButton>
                             <HStack spacing={3} cursor="pointer" _hover={{ bg: "gray.50" }} p={2} borderRadius="lg">
@@ -103,14 +72,9 @@ const Navbar = ({ user, onNavigate, onLogout, onMenuClick }) => {
                                         <Text fontSize="sm" fontWeight="500" color="gray.700">
                                             {user?.name || "Juan Pérez"}
                                         </Text>
-                                        <HStack spacing={1} align="center">
-                                            {isLoadingSubscription && (
-                                                <Spinner size="xs" color="sage.400" />
-                                            )}
-                                            <Text fontSize="xs" color="gray.500">
-                                                {getPlanDisplayName()}
-                                            </Text>
-                                        </HStack>
+                                        <Text fontSize="xs" color="gray.500">
+                                            Viajero Premium
+                                        </Text>
                                     </VStack>
                                 )}
                                 <Avatar

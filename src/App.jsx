@@ -65,14 +65,25 @@ function App() {
             setUser(savedUser)
         }
         setIsUserLoading(false)
-    }, []) // ← SIN DEPENDENCIAS para que solo se ejecute una vez
+    }, [])
 
     // Manejar redirección cuando hay usuario y está en ruta pública
     useEffect(() => {
-        if (user && !routerLoading && (currentRoute === routes.HOME || currentRoute === routes.LOGIN || currentRoute === routes.REGISTER)) {
-            navigate(routes.DASHBOARD)
+        if (user && !routerLoading) {
+            // Si el usuario está logueado Y en rutas específicas que requieren redirección
+            const redirectRoutes = [routes.HOME, routes.LOGIN, routes.REGISTER]
+            
+            if (redirectRoutes.includes(currentRoute)) {
+                // Si usuario está verificado, ir al dashboard
+                if (user.email_verified) {
+                    navigate(routes.DASHBOARD)
+                } else {
+                    // Si usuario NO está verificado, ir a verificación
+                    navigate(routes.VERIFY_EMAIL)
+                }
+            }
         }
-    }, [user, currentRoute, routerLoading]) // ← Solo cuando cambie el usuario o la ruta
+    }, [user, currentRoute, routerLoading])
 
     // FORZAR MODO CLARO - Prevenir que el sistema cambie el tema
     useEffect(() => {

@@ -2,6 +2,7 @@ import LandingPage from '../pages/LandingPage'
 import LoginPage from '../pages/LoginPage'
 import RegisterPage from '../pages/RegisterPage'
 import ForgotPasswordPage from '../pages/ForgotPasswordPage'
+import EmailVerificationPage from '../pages/EmailVerificationPage'
 import DashboardPage from '../pages/DashboardPage'
 import CreateTripPage from '../pages/CreateTripPage'
 import MyTripsPage from '../pages/MyTripsPage'
@@ -15,13 +16,13 @@ import { routes } from './routes'
 import { isPublicRoute } from './utils'
 
 export const RouteRenderer = ({
-                                  currentRoute,
-                                  routeParams,
-                                  user,
-                                  navigate,
-                                  onLogin,
-                                  onLogout
-                              }) => {
+    currentRoute,
+    routeParams,
+    user,
+    navigate,
+    onLogin,
+    onLogout
+}) => {
     const requireAuth = (component) => {
         if (!user) {
             return <LoginPage onNavigate={navigate} onLogin={onLogin} />
@@ -108,6 +109,20 @@ export const RouteRenderer = ({
         }
     }
 
+    const handleVerificationSuccess = () => {
+        // Actualizar el estado del usuario después de verificar
+        if (user) {
+            const updatedUser = { ...user, email_verified: true }
+            onLogin(updatedUser)
+        }
+    }
+
+    const handleRegisterSuccess = (userData) => {
+        // Después del registro exitoso, ir a verificación de email
+        onLogin(userData)
+        navigate('/verify-email')
+    }
+
     if (isPublicRoute(currentRoute)) {
         switch (currentRoute) {
             case routes.HOME:
@@ -117,10 +132,19 @@ export const RouteRenderer = ({
                 return <LoginPage onNavigate={navigate} onLogin={onLogin} />
 
             case routes.REGISTER:
-                return <RegisterPage onNavigate={navigate} onLogin={onLogin} />
+                return <RegisterPage onNavigate={navigate} onLogin={handleRegisterSuccess} />
 
             case routes.FORGOT_PASSWORD:
                 return <ForgotPasswordPage onNavigate={navigate} />
+
+            case routes.VERIFY_EMAIL:
+                return (
+                    <EmailVerificationPage
+                        onNavigate={navigate}
+                        userEmail={user?.email || 'usuario@email.com'}
+                        onVerificationSuccess={handleVerificationSuccess}
+                    />
+                )
 
             default:
                 return <LandingPage onNavigate={navigate} />

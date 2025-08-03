@@ -3,14 +3,15 @@ export const routes = {
     // Rutas públicas
     HOME: '/',
     LOGIN: '/login',
-    FORGOT_PASSWORD:'/forgot-password',
+    FORGOT_PASSWORD: '/forgot-password',
     REGISTER: '/register',
+    VERIFY_EMAIL: '/verify-email',
 
     // Rutas autenticadas
     DASHBOARD: '/dashboard',
     CREATE_TRIP: '/create-trip',
     MY_TRIPS: '/my-trips',
-    TRIP_DETAIL: '/trip-detail', // Ruta interna para /trip/:id
+    TRIP_DETAIL: '/trip-detail',
     PHOTOS: '/photos',
     STATS: '/stats',
     PROFILE: '/profile',
@@ -21,7 +22,8 @@ export const publicRoutes = [
     routes.HOME,
     routes.LOGIN,
     routes.FORGOT_PASSWORD,
-    routes.REGISTER
+    routes.REGISTER,
+    routes.VERIFY_EMAIL
 ]
 
 export const protectedRoutes = [

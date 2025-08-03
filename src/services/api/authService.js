@@ -1,17 +1,45 @@
 import { makeRequest } from './config.js'
 
 export const authService = {
-  register: (userData) => 
-    makeRequest('/auth/register', {
+  register: async (userData) => {
+    const response = await makeRequest('/auth/register', {
       method: 'POST',
       body: JSON.stringify(userData)
-    }),
+    })
+    
+    // Guardar token si viene en la respuesta
+    if (response.access_token) {
+      localStorage.setItem('access_token', response.access_token)
+      localStorage.setItem('refresh_token', response.refresh_token)
+      localStorage.setItem('user', JSON.stringify(response.user))
+    }
+    
+    return response
+  },
 
-  login: (credentials) => 
-    makeRequest('/auth/login', {
+  login: async (credentials) => {
+    const response = await makeRequest('/auth/login', {
       method: 'POST',
       body: JSON.stringify(credentials)
-    }),
+    })
+    
+    // Guardar token si viene en la respuesta
+    if (response.access_token) {
+      localStorage.setItem('access_token', response.access_token)
+      localStorage.setItem('refresh_token', response.refresh_token)
+      localStorage.setItem('user', JSON.stringify(response.user))
+    }
+    
+    return response
+  },
+
+  logout: () => {
+    localStorage.removeItem('access_token')
+    localStorage.removeItem('refresh_token')
+    localStorage.removeItem('user')
+    localStorage.removeItem('voyaj_user')
+    localStorage.removeItem('voyaj_session')
+  },
 
   getProfile: () => 
     makeRequest('/auth/profile'),
@@ -48,5 +76,21 @@ export const authService = {
       headers: {},
       body: formData
     })
+  },
+
+  // Verificar si el usuario está autenticado
+  isAuthenticated: () => {
+    const token = localStorage.getItem('access_token')
+    return !!token
+  },
+
+  // Obtener el usuario desde localStorage
+  getCurrentUser: () => {
+    try {
+      const user = localStorage.getItem('user')
+      return user ? JSON.parse(user) : null
+    } catch {
+      return null
+    }
   }
 }

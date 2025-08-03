@@ -46,7 +46,7 @@ import {
 import { authService } from '../services/api/authService.js'
 import { friendshipsService } from '../services/api/friendshipsService.js'
 
-const ProfilePage = ({ user, setUser }) => {
+const ProfilePage = ({ user, setUser, onLogin }) => {
     const [friends, setFriends] = useState([])
     const [friendRequests, setFriendRequests] = useState({ received: [], sent: [] })
     const [searchQuery, setSearchQuery] = useState('')
@@ -66,14 +66,7 @@ const ProfilePage = ({ user, setUser }) => {
             setUser(freshUserData)
             localStorage.setItem('user', JSON.stringify(freshUserData))
         } catch (error) {
-            console.error('[2025-01-02 00:00:00] [PROFILE] [ERROR] Failed to refresh profile')
-            toast({
-                title: 'Error al cargar perfil',
-                description: 'Verifica tu sesión',
-                status: 'error',
-                duration: 5000,
-                isClosable: true,
-            })
+            console.error('[2025-01-02 00:00:00] [PROFILE] [ERROR] Failed to refresh profile:', error)
         }
     }
 
@@ -87,13 +80,7 @@ const ProfilePage = ({ user, setUser }) => {
             setFriends(friendsData)
             setFriendRequests(requestsData)
         } catch (error) {
-            toast({
-                title: 'Error al cargar amigos',
-                description: error.toString(),
-                status: 'error',
-                duration: 5000,
-                isClosable: true,
-            })
+            console.error('[2025-01-02 00:00:00] [FRIENDSHIPS] [ERROR] Failed to load friends data:', error)
         } finally {
             setLoading(false)
         }
@@ -318,41 +305,6 @@ const ProfilePage = ({ user, setUser }) => {
                                 </Text>
                             </HStack>
                         </SimpleGrid>
-
-                        {!user.email_verified && (
-                            <Alert status="warning" borderRadius="md">
-                                <AlertIcon />
-                                <Text fontSize="sm">
-                                    Tu email no está verificado
-                                </Text>
-                                <Button
-                                    size="sm"
-                                    colorScheme="orange"
-                                    ml={3}
-                                    onClick={async () => {
-                                        try {
-                                            await authService.sendVerificationEmail()
-                                            toast({
-                                                title: 'Código de verificación enviado',
-                                                status: 'success',
-                                                duration: 3000,
-                                                isClosable: true,
-                                            })
-                                        } catch (error) {
-                                            toast({
-                                                title: 'Error al enviar código',
-                                                description: error.toString(),
-                                                status: 'error',
-                                                duration: 5000,
-                                                isClosable: true,
-                                            })
-                                        }
-                                    }}
-                                >
-                                    Verificar
-                                </Button>
-                            </Alert>
-                        )}
                     </VStack>
                 </Flex>
             </CardBody>

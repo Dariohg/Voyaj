@@ -1,26 +1,26 @@
 import { makeRequest } from './config.js'
 
 export const friendshipsService = {
-  sendFriendRequest: (userData) => 
-    makeRequest('/friendships/send-request', {
-      method: 'POST',
-      body: JSON.stringify(userData)
-    }),
+  getFriends: () => 
+    makeRequest('/friendships/'),
 
   getFriendRequests: () => 
     makeRequest('/friendships/requests'),
 
-  respondToRequest: (requestId, response) => 
-    makeRequest(`/friendships/respond/${requestId}`, {
+  sendFriendRequest: (data) => 
+    makeRequest('/friendships/requests', {
       method: 'POST',
-      body: JSON.stringify(response)
+      body: JSON.stringify(data)
     }),
 
-  getFriends: () => 
-    makeRequest('/friendships/friends'),
+  respondToRequest: (requestId, data) => 
+    makeRequest(`/friendships/requests/${requestId}/respond`, {
+      method: 'POST',
+      body: JSON.stringify(data)
+    }),
 
   removeFriend: (friendId) => 
-    makeRequest(`/friendships/remove/${friendId}`, {
+    makeRequest(`/friendships/${friendId}`, {
       method: 'DELETE'
     })
 }
